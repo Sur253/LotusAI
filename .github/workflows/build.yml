@@ -16,13 +16,40 @@ jobs:
 
       - name: Extract Android project
         run: |
-          mkdir lotus-project
+          rm -rf lotus-project
           unzip -o NilaAI_Android_Project.zip -d lotus-project
 
-      - name: Find Android project
+      - name: Fix JVM target
+        working-directory: lotus-project/PersonalVideoAI
         run: |
-          echo "Searching for Gradle project..."
-          find lotus-project -name settings.gradle -o -name settings.gradle.kts -o -name build.gradle -o -name build.gradle.kts
+          python3 - <<'PY'
+          from pathlib import Path
+
+          p = Path("app/build.gradle")
+          text = p.read_text()
+
+          marker = """    defaultConfig {
+"""
+
+          insert = """    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
+    }
+
+    kotlinOptions {
+        jvmTarget = "17"
+    }
+
+"""
+
+          if "sourceCompatibility JavaVersion.VERSION_17" not in text:
+              text = text.replace(marker, insert + marker)
+
+          p.write_text(text)
+          PY
+
+          echo "===== app/build.gradle ====="
+          cat app/build.gradle
 
       - name: Set up Java
         uses: actions/setup-java@v4
@@ -36,14 +63,11 @@ jobs:
           gradle-version: '8.9'
 
       - name: Build APK
-        run: |
-          PROJECT_DIR=$(dirname "$(find lotus-project -name settings.gradle -o -name settings.gradle.kts | head -1)")
-          echo "Project directory: $PROJECT_DIR"
-          cd "$PROJECT_DIR"
-          gradle assembleDebug
+        working-directory: lotus-project/PersonalVideoAI
+        run: gradle assembleDebug
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
           name: Lotus-AI-APK
-          path: '**/app/build/outputs/apk/debug/app-debug.apk'
+          path: lotus-project/PersonalVideoAI/app/build/outputs/apk/debug/app-debug.apk
