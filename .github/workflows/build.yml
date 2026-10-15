@@ -22,33 +22,20 @@ jobs:
       - name: Fix JVM target
         working-directory: lotus-project/PersonalVideoAI
         run: |
-          python3 - <<'PY'
-          from pathlib import Path
+          sed -i '/android {/a\
+              compileOptions {\
+                  sourceCompatibility JavaVersion.VERSION_17\
+                  targetCompatibility JavaVersion.VERSION_17\
+              }\
+          ' app/build.gradle
 
-          p = Path("app/build.gradle")
-          text = p.read_text()
+          sed -i '/android {/a\
+              kotlinOptions {\
+                  jvmTarget = "17"\
+              }\
+          ' app/build.gradle
 
-          marker = """    defaultConfig {
-"""
-
-          insert = """    compileOptions {
-        sourceCompatibility JavaVersion.VERSION_17
-        targetCompatibility JavaVersion.VERSION_17
-    }
-
-    kotlinOptions {
-        jvmTarget = "17"
-    }
-
-"""
-
-          if "sourceCompatibility JavaVersion.VERSION_17" not in text:
-              text = text.replace(marker, insert + marker)
-
-          p.write_text(text)
-          PY
-
-          echo "===== app/build.gradle ====="
+          echo "===== build.gradle ====="
           cat app/build.gradle
 
       - name: Set up Java
