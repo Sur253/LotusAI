@@ -17,7 +17,7 @@ jobs:
       - name: Extract Android project
         run: |
           rm -rf lotus-project
-          unzip -o NilaAI_Android_Project.zip -d lotus-project
+          unzip -o LotusAI-Step3-Gemini.zip -d lotus-project
 
       - name: Fix JVM target
         working-directory: lotus-project/PersonalVideoAI
