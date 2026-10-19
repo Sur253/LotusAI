@@ -143,7 +143,7 @@ class MainActivity : Activity() {
             text = "Lotus உங்களுக்காக ready.\n\n🎙️ பேசலாம்\n🎥 Video upload செய்யலாம்\n💬 கேள்வி கேட்கலாம்"
             textSize = 16f
             gravity = Gravity.CENTER
-            setTextColor(text)
+            setTextColor(this@MainActivity.text)
             setPadding(20, 24, 20, 24)
             background = rounded(panel, Color.rgb(48, 40, 62), 24f)
         }
@@ -159,7 +159,7 @@ class MainActivity : Activity() {
 
         input = EditText(this).apply {
             hint = "Lotus-விடம் கேளுங்கள்..."
-            setTextColor(text)
+            setTextColor(this@MainActivity.text)
             setHintTextColor(Color.rgb(120, 125, 145))
             setPadding(18, 14, 18, 14)
             background = rounded(panel, Color.rgb(55, 58, 78), 22f)
