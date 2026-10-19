@@ -118,7 +118,7 @@ class MainActivity : Activity() {
         root.addView(TextView(this).apply {
             text = "வணக்கம்! நான் Lotus. ✨"
             textSize = 20f
-            setTextColor(text)
+            setTextColor(this@MainActivity.text)
             gravity = Gravity.CENTER
             setPadding(0, 18, 0, 4)
         })
