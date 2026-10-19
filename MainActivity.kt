@@ -87,7 +87,7 @@ class MainActivity : Activity() {
             text = "⚙"
             textSize = 25f
             gravity = Gravity.CENTER
-            setTextColor(text)
+            setTextColor(this@MainActivity.text)
             setPadding(12, 8, 8, 8)
             setOnClickListener { showSettings() }
         })
