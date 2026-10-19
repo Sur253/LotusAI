@@ -74,7 +74,7 @@ class MainActivity : Activity() {
         titleBox.addView(TextView(this).apply {
             text = "LOTUS AI"
             textSize = 23f
-            setTextColor(text)
+            setTextColor(this@MainActivity.text)
             typeface = android.graphics.Typeface.DEFAULT_BOLD
         })
         titleBox.addView(TextView(this).apply {
