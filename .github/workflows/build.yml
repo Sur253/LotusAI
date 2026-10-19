@@ -18,7 +18,10 @@ jobs:
         run: |
           rm -rf lotus-project
           unzip -o LotusAI-Step3-Gemini.zip -d lotus-project
-
+      - name: Fix text colors
+        working-directory: lotus-project/PersonalVideoAI
+        run: |
+          sed -i 's/setTextColor(this@MainActivity.text)/setTextColor(android.graphics.Color.WHITE)/g' app/src/main/java/com/personalvideoai/MainActivity.kt
       - name: Fix JVM target
         working-directory: lotus-project/PersonalVideoAI
         run: |
