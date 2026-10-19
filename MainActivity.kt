@@ -45,7 +45,7 @@ class MainActivity : Activity() {
     private fun pill(textValue: String, onClick: () -> Unit): TextView = TextView(this).apply {
         text = textValue
         textSize = 15f
-        setTextColor(text)
+        setTextColor(this@MainActivity.text)
         gravity = Gravity.CENTER
         setPadding(18, 14, 18, 14)
         background = rounded(panel, Color.rgb(55, 58, 78), 40f)
