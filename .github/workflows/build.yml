@@ -21,6 +21,7 @@ jobs:
       - name: Fix text colors
         working-directory: lotus-project/PersonalVideoAI
         run: |
+          sed -i 's/setTextColor(text)/setTextColor(android.graphics.Color.WHITE)/g' app/src/main/java/com/personalvideoai/MainActivity.kt
           sed -i 's/setTextColor(this@MainActivity.text)/setTextColor(android.graphics.Color.WHITE)/g' app/src/main/java/com/personalvideoai/MainActivity.kt
       - name: Fix JVM target
         working-directory: lotus-project/PersonalVideoAI
