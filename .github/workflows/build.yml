@@ -23,6 +23,13 @@ jobs:
         run: |
           sed -i 's/setTextColor(text)/setTextColor(android.graphics.Color.WHITE)/g' app/src/main/java/com/personalvideoai/MainActivity.kt
           sed -i 's/setTextColor(this@MainActivity.text)/setTextColor(android.graphics.Color.WHITE)/g' app/src/main/java/com/personalvideoai/MainActivity.kt
+      - name: Check Gemini source
+        working-directory: lotus-project/PersonalVideoAI
+        run: |
+          echo "===== GeminiClient.kt ====="
+          sed -n '1,240p' app/src/main/java/com/personalvideoai/GeminiClient.kt
+          echo "===== MainActivity Gemini calls ====="
+          grep -n "GeminiClient\|sendToAi\|api_key" app/src/main/java/com/personalvideoai/MainActivity.kt || true
       - name: Fix JVM target
         working-directory: lotus-project/PersonalVideoAI
         run: |
