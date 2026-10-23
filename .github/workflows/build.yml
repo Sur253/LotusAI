@@ -30,6 +30,15 @@ jobs:
           sed -n '1,240p' app/src/main/java/com/personalvideoai/GeminiClient.kt
           echo "===== MainActivity Gemini calls ====="
           grep -n "GeminiClient\|sendToAi\|api_key" app/src/main/java/com/personalvideoai/MainActivity.kt || true
+      - name: Fix Gemini timeout
+        working-directory: lotus-project/PersonalVideoAI
+        run: |
+          sed -i 's/TimeUnit.SECONDS/TimeUnit.SECONDS/g' app/src/main/java/com/personalvideoai/GeminiClient.kt
+          sed -i 's/readTimeout(180, TimeUnit.SECONDS)/readTimeout(30, TimeUnit.SECONDS)/g' app/src/main/java/com/personalvideoai/GeminiClient.kt
+          sed -i 's/writeTimeout(180, TimeUnit.SECONDS)/writeTimeout(30, TimeUnit.SECONDS)/g' app/src/main/java/com/personalvideoai/GeminiClient.kt
+          sed -i 's/connectTimeout(30, TimeUnit.SECONDS)/connectTimeout(15, TimeUnit.SECONDS)/g' app/src/main/java/com/personalvideoai/GeminiClient.kt
+          echo "===== Gemini timeout fixed ====="
+          grep -n "Timeout" app/src/main/java/com/personalvideoai/GeminiClient.kt
       - name: Fix JVM target
         working-directory: lotus-project/PersonalVideoAI
         run: |
