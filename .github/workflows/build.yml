@@ -23,8 +23,77 @@ jobs:
         run: |
           sed -i 's/setTextColor(text)/setTextColor(android.graphics.Color.WHITE)/g' app/src/main/java/com/personalvideoai/MainActivity.kt
           sed -i 's/setTextColor(this@MainActivity.text)/setTextColor(android.graphics.Color.WHITE)/g' app/src/main/java/com/personalvideoai/MainActivity.kt
-      - name: Check Gemini source
+      - name: Add Lotus voice reply and UI fix
         working-directory: lotus-project/PersonalVideoAI
+        run: |
+         python3 - <<'PY' 
+                  from pathlib import Path
+
+          p = Path("app/src/main/java/com/personalvideoai/MainActivity.kt")
+          s = p.read_text()
+
+          s = s.replace(
+              'import android.speech.RecognizerIntent',
+              'import android.speech.RecognizerIntent\nimport android.speech.tts.TextToSpeech\nimport java.util.Locale'
+          )
+
+          s = s.replace(
+              'private val executor = Executors.newSingleThreadExecutor()',
+              'private val executor = Executors.newSingleThreadExecutor()\nprivate var tts: TextToSpeech? = null'
+          )
+
+          s = s.replace(
+              'buildUi()\n\n}',
+              '''tts = TextToSpeech(this) { status ->
+              if (status == TextToSpeech.SUCCESS) {
+                  tts?.language = Locale("ta", "IN")
+              }
+          }
+
+          buildUi()
+
+          }'''
+          )
+
+          s = s.replace(
+              'gravity = Gravity.CENTER',
+              'gravity = Gravity.TOP or Gravity.START'
+          )
+
+          s = s.replace(
+              'LinearLayout.LayoutParams(-1, 180)',
+              'LinearLayout.LayoutParams(-1, 320)'
+          )
+
+          s = s.replace(
+              'runOnUiThread { chat.text = "Lotus:\\n\\n$answer"; input.text.clear(); input.isEnabled = true }',
+              '''runOnUiThread {
+                  chat.text = "Lotus:\\n\\n$answer"
+                  input.text.clear()
+                  input.isEnabled = true
+                  tts?.speak(answer, TextToSpeech.QUEUE_FLUSH, null, "lotus_reply")
+              }'''
+          )
+
+          s = s.replace(
+              'override fun onActivityResult(',
+              '''override fun onDestroy() {
+              tts?.stop()
+              tts?.shutdown()
+              executor.shutdownNow()
+              super.onDestroy()
+          }
+
+          override fun onActivityResult('''
+          )
+
+          p.write_text(s)
+          PY
+
+          echo "===== Lotus voice + UI fix applied ====="
+          grep -n "TextToSpeech\|lotus_reply\|LayoutParams(-1, 320)" app/src/main/java/com/personalvideoai/MainActivity.kt || true - name: Check Gemini source
+      - name: Check Gemini source
+        working-directory: lotus-project/PersonalVideoAI  
         run: |
           echo "===== GeminiClient.kt ====="
           sed -n '1,240p' app/src/main/java/com/personalvideoai/GeminiClient.kt
