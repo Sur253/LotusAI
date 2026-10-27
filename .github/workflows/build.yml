@@ -23,75 +23,29 @@ jobs:
         run: |
           sed -i 's/setTextColor(text)/setTextColor(android.graphics.Color.WHITE)/g' app/src/main/java/com/personalvideoai/MainActivity.kt
           sed -i 's/setTextColor(this@MainActivity.text)/setTextColor(android.graphics.Color.WHITE)/g' app/src/main/java/com/personalvideoai/MainActivity.kt
-      - name: Add Lotus voice reply and UI fix
+      - name: Lotus UI and voice setup
         working-directory: lotus-project/PersonalVideoAI
         run: |
-          python3 - <<'PY'
-          from pathlib import Path
+          FILE="app/src/main/java/com/personalvideoai/MainActivity.kt"
 
-          p = Path("app/src/main/java/com/personalvideoai/MainActivity.kt")
-          s = p.read_text()
+          sed -i 's/START_VERTICAL/VERTICAL/g' "$FILE"
 
-          s = s.replace(
-              "import android.speech.RecognizerIntent",
-              "import android.speech.RecognizerIntent\nimport android.speech.tts.TextToSpeech\nimport java.util.Locale"
-          )
+          sed -i '/import android.speech.RecognizerIntent/a import android.speech.tts.TextToSpeech' "$FILE"
+          sed -i '/import android.speech.tts.TextToSpeech/a import java.util.Locale' "$FILE"
 
-          s = s.replace(
-              "private val executor = Executors.newSingleThreadExecutor()",
-              "private val executor = Executors.newSingleThreadExecutor()\nprivate var tts: TextToSpeech? = null"
-          )
+          sed -i '/private val executor = Executors.newSingleThreadExecutor()/a private var tts: TextToSpeech? = null' "$FILE"
 
-          s = s.replace(
-              "buildUi()\n\n}",
-              """tts = TextToSpeech(this) { status ->
-              if (status == TextToSpeech.SUCCESS) {
-                  tts?.language = Locale("ta", "IN")
-              }
-          }
+          sed -i 's/LinearLayout.LayoutParams(-1, 180)/LinearLayout.LayoutParams(-1, 320)/' "$FILE"
 
-          buildUi()
+          sed -i '/^[[:space:]]*buildUi()/i\
+          tts = TextToSpeech(this) { status ->\
+              if (status == TextToSpeech.SUCCESS) {\
+                  tts?.language = Locale("ta", "IN")\
+              }\
+          }' "$FILE"
 
-          }"""
-          )
-
-          s = s.replace(
-              "gravity = Gravity.CENTER",
-              "gravity = Gravity.TOP or Gravity.START"
-          )
-
-          s = s.replace(
-              "LinearLayout.LayoutParams(-1, 180)",
-              "LinearLayout.LayoutParams(-1, 320)"
-          )
-
-          s = s.replace(
-              'runOnUiThread { chat.text = "Lotus:\\n\\n$answer"; input.text.clear(); input.isEnabled = true }',
-              """runOnUiThread {
-                  chat.text = "Lotus:\\n\\n$answer"
-                  input.text.clear()
-                  input.isEnabled = true
-                  tts?.speak(answer, TextToSpeech.QUEUE_FLUSH, null, "lotus_reply")
-              }"""
-          )
-
-          s = s.replace(
-              "override fun onActivityResult(",
-              """override fun onDestroy() {
-              tts?.stop()
-              tts?.shutdown()
-              executor.shutdownNow()
-              super.onDestroy()
-          }
-
-          override fun onActivityResult("""
-          )
-
-          p.write_text(s)
-          PY
-
-          echo "===== Lotus voice + UI fix applied ====="
-          grep -n "TextToSpeech\|lotus_reply\|LayoutParams(-1, 320)" app/src/main/java/com/personalvideoai/MainActivity.kt || true
+          echo "===== Lotus UI and voice setup applied ====="
+          grep -n "TextToSpeech\|Locale\|320" "$FILE" || true 
       - name: Check Gemini source
         working-directory: lotus-project/PersonalVideoAI  
         run: |
