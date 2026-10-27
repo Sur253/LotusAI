@@ -77,6 +77,18 @@ jobs:
           sed -i 's/connectTimeout(30, TimeUnit.SECONDS)/connectTimeout(15, TimeUnit.SECONDS)/g' app/src/main/java/com/personalvideoai/GeminiClient.kt
           echo "===== Gemini timeout fixed ====="
           grep -n "Timeout" app/src/main/java/com/personalvideoai/GeminiClient.kt
+      - name: Fix Gemini connection
+        working-directory: lotus-project/PersonalVideoAI
+        run: |
+          FILE="app/src/main/java/com/personalvideoai/GeminiClient.kt"
+
+          sed -i 's/\.connectTimeout(30, TimeUnit.SECONDS)/.connectTimeout(60, TimeUnit.SECONDS)/' "$FILE"
+          sed -i 's/\.readTimeout(180, TimeUnit.SECONDS)/.readTimeout(120, TimeUnit.SECONDS)/' "$FILE"
+          sed -i 's/\.writeTimeout(180, TimeUnit.SECONDS)/.writeTimeout(120, TimeUnit.SECONDS)/' "$FILE"
+          sed -i 's/private val model = ".*"/private val model = "gemini-3.8-flash"/' "$FILE"
+
+          echo "===== Gemini connection fixed ====="
+          grep -n "connectTimeout\|readTimeout\|writeTimeout\|private val model" "$FILE"   
       - name: Fix JVM target
         working-directory: lotus-project/PersonalVideoAI
         run: |
