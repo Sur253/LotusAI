@@ -46,6 +46,21 @@ jobs:
 
           echo "===== Lotus UI and voice setup applied ====="
           grep -n "TextToSpeech\|Locale\|320" "$FILE" || true 
+      - name: Lotus final UI layout
+        working-directory: lotus-project/PersonalVideoAI
+        run: |
+          FILE="app/src/main/java/com/personalvideoai/MainActivity.kt"
+
+          sed -i 's/window.statusBarColor = .*/window.statusBarColor = bg/' "$FILE"
+          sed -i 's/window.navigationBarColor = .*/window.navigationBarColor = bg/' "$FILE"
+
+          sed -i 's/LinearLayout.LayoutParams(-1, 320)/LinearLayout.LayoutParams(-1, 0).apply { weight = 1f }/' "$FILE"
+
+          sed -i 's/🎙️ பேச/🎙️ Ask Lotus/' "$FILE"
+          sed -i 's/text = "SEND ➜"/text = "🎙️ Ask Lotus"/' "$FILE"
+
+          echo "===== Lotus final UI layout applied ====="
+          grep -n "Ask Lotus\|weight = 1f\|statusBarColor" "$FILE" || true  
       - name: Check Gemini source
         working-directory: lotus-project/PersonalVideoAI  
         run: |
