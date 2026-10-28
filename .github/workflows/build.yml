@@ -89,6 +89,57 @@ jobs:
 
           echo "===== Gemini connection fixed ====="
           grep -n "connectTimeout\|readTimeout\|writeTimeout\|private val model" "$FILE"   
+      - name: Add Gemini automatic retry
+        working-directory: lotus-project/PersonalVideoAI
+        run: |
+          FILE="app/src/main/java/com/personalvideoai/GeminiClient.kt"
+
+          python3 - <<'PY'
+          from pathlib import Path
+
+          p = Path("app/src/main/java/com/personalvideoai/GeminiClient.kt")
+          s = p.read_text()
+
+          marker = 'private val client = OkHttpClient.Builder()'
+          old = '''private val client = OkHttpClient.Builder()
+          '''
+
+          if 'Add Gemini automatic retry' in s:
+              print("Retry already present")
+              raise SystemExit(0)
+
+          interceptor = '''private val client = OkHttpClient.Builder()
+              .addInterceptor { chain ->
+                  var lastResponse: okhttp3.Response? = null
+                  for (attempt in 0..2) {
+                      lastResponse?.close()
+                      val response = chain.proceed(chain.request())
+
+                      if (response.isSuccessful ||
+                          response.code != 429 &&
+                          response.code !in 500..599) {
+                          return@addInterceptor response
+                      }
+
+                      lastResponse = response
+
+                      if (attempt < 2) {
+                          Thread.sleep((attempt + 1) * 2000L)
+                      }
+                  }
+                  return@addInterceptor lastResponse!!
+              }
+          '''
+
+          if marker not in s:
+              raise SystemExit("GeminiClient builder not found")
+
+          s = s.replace(old, interceptor, 1)
+          p.write_text(s)
+          PY
+
+          echo "===== Gemini automatic retry added ====="
+          grep -n "addInterceptor\|attempt in 0..2\|Thread.sleep" "$FILE"
       - name: Fix JVM target
         working-directory: lotus-project/PersonalVideoAI
         run: |
