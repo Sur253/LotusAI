@@ -140,6 +140,13 @@ jobs:
 
           echo "===== Gemini automatic retry added ====="
           grep -n "addInterceptor\|attempt in 0..2\|Thread.sleep" "$FILE"
+      - name: Use stable fallback Gemini model
+        working-directory: lotus-project/PersonalVideoAI
+        run: |
+          FILE="app/src/main/java/com/personalvideoai/GeminiClient.kt"
+          sed -i 's/private val model = "gemini-3.8-flash"/private val model = "gemini-3.6-flash"/' "$FILE"
+          echo "===== Gemini fallback model ====="
+          grep -n "private val model" "$FILE"  
       - name: Fix JVM target
         working-directory: lotus-project/PersonalVideoAI
         run: |
