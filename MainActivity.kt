@@ -259,6 +259,14 @@ class MainActivity : Activity() {
             )
         }
     }
+}
+} catch (e: Exception) {
+    runOnUiThread {
+        chat.text = "Lotus:\n\n❌ ${e.message ?: "AI request failed"}"
+        input.isEnabled = true
+    }
+}
+        }
                 
     private fun getFileName(uri: Uri): String {
         var name = "video"
