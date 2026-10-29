@@ -260,11 +260,6 @@ class MainActivity : Activity() {
         }
     }
                 
-     input.text.clear(); input.isEnabled = true }
-            } catch (e: Exception) { runOnUiThread { chat.text = "Lotus:\n\n❌ ${e.message ?: "AI request failed"}"; input.isEnabled = true } }
-        }
-    }
-
     private fun getFileName(uri: Uri): String {
         var name = "video"
         contentResolver.query(uri, arrayOf(OpenableColumns.DISPLAY_NAME), null, null, null)?.use { if (it.moveToFirst()) name = it.getString(0) }
