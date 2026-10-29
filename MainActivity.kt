@@ -240,16 +240,26 @@ class MainActivity : Activity() {
     input.text.clear()
     input.isEnabled = true
 
-    val tts = android.speech.tts.TextToSpeech(this) { status ->
+    lateinit var voice: android.speech.tts.TextToSpeech
+
+    voice = android.speech.tts.TextToSpeech(this) { status ->
         if (status == android.speech.tts.TextToSpeech.SUCCESS) {
-            val result = tts.setLanguage(java.util.Locale("ta", "IN"))
+            val result = voice.setLanguage(java.util.Locale("ta", "IN"))
+
             if (result == android.speech.tts.TextToSpeech.LANG_MISSING_DATA ||
                 result == android.speech.tts.TextToSpeech.LANG_NOT_SUPPORTED) {
-                tts.language = java.util.Locale.US
+                voice.language = java.util.Locale.US
             }
-            tts.speak(answer, android.speech.tts.TextToSpeech.QUEUE_FLUSH, null, "lotus_reply")
+
+            voice.speak(
+                answer,
+                android.speech.tts.TextToSpeech.QUEUE_FLUSH,
+                null,
+                "lotus_reply"
+            )
         }
     }
+                
      input.text.clear(); input.isEnabled = true }
             } catch (e: Exception) { runOnUiThread { chat.text = "Lotus:\n\n❌ ${e.message ?: "AI request failed"}"; input.isEnabled = true } }
         }
