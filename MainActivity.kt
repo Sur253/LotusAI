@@ -277,12 +277,18 @@ class MainActivity : Activity() {
                 chat.text = "Lotus:\n\n$answer"
                 Toast.makeText(this, "TTS TEST", Toast.LENGTH_SHORT).show()
                 if (::tts.isInitialized) {
-    tts.speak(
+    val ttsResult = tts.speak(
         answer,
         android.speech.tts.TextToSpeech.QUEUE_FLUSH,
         null,
         "lotus_reply"
     )
+
+    Toast.makeText(
+        this,
+        "TTS result: $ttsResult",
+        Toast.LENGTH_LONG
+    ).show()
                 }
 
                 input.text.clear()
