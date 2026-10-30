@@ -34,6 +34,19 @@ class MainActivity : Activity() {
         window.statusBarColor = bg
         window.navigationBarColor = bg
         buildUi()
+        tts = android.speech.tts.TextToSpeech(this) { status ->
+    if (status == android.speech.tts.TextToSpeech.SUCCESS) {
+        val result = tts.setLanguage(java.util.Locale("ta", "IN"))
+
+        ttsReady = result != android.speech.tts.TextToSpeech.LANG_MISSING_DATA &&
+                   result != android.speech.tts.TextToSpeech.LANG_NOT_SUPPORTED
+
+        if (!ttsReady) {
+            tts.setLanguage(java.util.Locale.US)
+            ttsReady = true
+        }
+    }
+        }
     }
 
     private fun rounded(fill: Int, stroke: Int = Color.TRANSPARENT, radius: Float = 24f): GradientDrawable =
