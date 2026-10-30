@@ -275,7 +275,7 @@ class MainActivity : Activity() {
 
             runOnUiThread {
                 chat.text = "Lotus:\n\n$answer"
-
+                Toast.makeText(this, "TTS TEST", Toast.LENGTH_SHORT).show()
                 if (::tts.isInitialized) {
     tts.speak(
         answer,
