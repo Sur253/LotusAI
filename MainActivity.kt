@@ -27,7 +27,8 @@ class MainActivity : Activity() {
     private val text = Color.WHITE
     private val muted = Color.rgb(165, 170, 190)
     private val accent = Color.rgb(210, 175, 255)
-
+    private lateinit var tts: android.speech.tts.TextToSpeech
+    private var ttsReady = false
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         window.statusBarColor = bg
@@ -240,23 +241,6 @@ class MainActivity : Activity() {
     input.text.clear()
     input.isEnabled = true
 
-    lateinit var voice: android.speech.tts.TextToSpeech
-
-    voice = android.speech.tts.TextToSpeech(this) { status ->
-        if (status == android.speech.tts.TextToSpeech.SUCCESS) {
-            val result = voice.setLanguage(java.util.Locale("ta", "IN"))
-
-            if (result == android.speech.tts.TextToSpeech.LANG_MISSING_DATA ||
-                result == android.speech.tts.TextToSpeech.LANG_NOT_SUPPORTED) {
-                voice.language = java.util.Locale.US
-            }
-
-            voice.speak(
-                answer,
-                android.speech.tts.TextToSpeech.QUEUE_FLUSH,
-                null,
-                "lotus_reply"
-            )
         }
     }
 }
