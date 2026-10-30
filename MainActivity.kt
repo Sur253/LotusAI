@@ -276,13 +276,13 @@ class MainActivity : Activity() {
             runOnUiThread {
                 chat.text = "Lotus:\n\n$answer"
 
-                if (ttsReady) {
-                    tts.speak(
-                        answer,
-                        android.speech.tts.TextToSpeech.QUEUE_FLUSH,
-                        null,
-                        "lotus_reply"
-                    )
+                if (::tts.isInitialized) {
+    tts.speak(
+        answer,
+        android.speech.tts.TextToSpeech.QUEUE_FLUSH,
+        null,
+        "lotus_reply"
+    )
                 }
 
                 input.text.clear()
