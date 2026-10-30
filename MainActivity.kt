@@ -239,31 +239,64 @@ class MainActivity : Activity() {
     }
 
     private fun sendToAi() {
-        val question = input.text.toString().trim()
-        if (question.isBlank() && selectedVideo == null) { Toast.makeText(this, "ஒரு கேள்வி கேளுங்கள்.", Toast.LENGTH_SHORT).show(); return }
-        val key = prefs.getString("api_key", "").orEmpty()
-        if (key.isBlank()) { Toast.makeText(this, "Settings-ல் Gemini API key save செய்யுங்கள்.", Toast.LENGTH_LONG).show(); showSettings(); return }
-        chat.text = "Lotus யோசிக்கிறது… ⏳"
-        input.isEnabled = false
-        val video = selectedVideo
-        executor.execute {
-            try {
-                val answer = if (video != null) GeminiClient(this).askAboutVideo(key, video, question.ifBlank { "இந்த video-வில் என்ன நடக்கிறது? Tamil/Tanglish-ல் விளக்குங்கள்." }) else GeminiClient(this).chat(key, question)
-                runOnUiThread {
-    chat.text = "Lotus:\n\n$answer"
-    input.text.clear()
-    input.isEnabled = true
+    val question = input.text.toString().trim()
 
+    if (question.isBlank() && selectedVideo == null) {
+        Toast.makeText(this, "ஒரு கேள்வி கேளுங்கள்.", Toast.LENGTH_SHORT).show()
+        return
+    }
+
+    val key = prefs.getString("api_key", "").orEmpty()
+
+    if (key.isBlank()) {
+        Toast.makeText(this, "Settings-ல் Gemini API key save செய்யுங்கள்.", Toast.LENGTH_LONG).show()
+        showSettings()
+        return
+    }
+
+    chat.text = "Lotus யோசிக்கிறது… ⏳"
+    input.isEnabled = false
+
+    val video = selectedVideo
+
+    executor.execute {
+        try {
+            val answer = if (video != null) {
+                GeminiClient(this).askAboutVideo(
+                    key,
+                    video,
+                    question.ifBlank {
+                        "இந்த video-வில் என்ன நடக்கிறது? Tamil/Tanglish-ல் விளக்குங்கள்."
+                    }
+                )
+            } else {
+                GeminiClient(this).chat(key, question)
+            }
+
+            runOnUiThread {
+                chat.text = "Lotus:\n\n$answer"
+
+                if (ttsReady) {
+                    tts.speak(
+                        answer,
+                        android.speech.tts.TextToSpeech.QUEUE_FLUSH,
+                        null,
+                        "lotus_reply"
+                    )
+                }
+
+                input.text.clear()
+                input.isEnabled = true
+            }
+
+        } catch (e: Exception) {
+            runOnUiThread {
+                chat.text = "Lotus:\n\n❌ ${e.message ?: "AI request failed"}"
+                input.isEnabled = true
+            }
         }
     }
-}
-} catch (e: Exception) {
-    runOnUiThread {
-        chat.text = "Lotus:\n\n❌ ${e.message ?: "AI request failed"}"
-        input.isEnabled = true
     }
-}
-        }
                 
     private fun getFileName(uri: Uri): String {
         var name = "video"
@@ -271,5 +304,11 @@ class MainActivity : Activity() {
         return name
     }
 
-    override fun onDestroy() { executor.shutdownNow(); super.onDestroy() }
-}
+    override fun onDestroy() {
+    if (::tts.isInitialized) {
+        tts.stop()
+        tts.shutdown()
+    }
+    executor.shutdownNow()
+    super.onDestroy()
+    }
