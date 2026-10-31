@@ -46,9 +46,18 @@ jobs:
 
           if 'tts?.speak(answer' not in s:
               marker = 'chat.text = "Lotus:\\n\\n$answer"'
-              replacement = '''chat.text = "Lotus:\\n\\n$answer"
+              replacement = '''chat.text = "Lotus:\n\n$answer"
+            val voiceAnswer = answer
+               .replace(Regex("[\\x{1F300}-\\x{1FAFF}]"), "")
+               .replace(Regex("(?i)need help with anything else\\??"), "")
+               .replace(Regex("(?i)anything else I can help with\\??"), "")
+               .replace(Regex("வேற ஏதாவது உதவி வேண்டுமா\\??"), "")
+               .replace(Regex("வேறு ஏதாவது உதவி வேண்டுமா\\??"), "")
+               .replace(Regex("\\s+"), " ")
+               .trim()
+
                   tts?.speak(
-                      answer,
+                      voiceAnswer,
                       TextToSpeech.QUEUE_FLUSH,
                       null,
                       "lotus_reply"
