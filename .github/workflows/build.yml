@@ -18,6 +18,53 @@ jobs:
         run: |
           rm -rf lotus-project
           unzip -o LotusAI-Step3-Gemini.zip -d lotus-project
+      - name: Fix Lotus TTS
+        working-directory: lotus-project/PersonalVideoAI
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+
+          manifest = Path("app/src/main/AndroidManifest.xml")
+          s = manifest.read_text()
+
+          if "android.intent.action.TTS_SERVICE" not in s:
+              s = s.replace(
+                  '    <application',
+                  '''    <queries>
+                  <intent>
+                      <action android:name="android.intent.action.TTS_SERVICE" />
+                  </intent>
+              </queries>
+
+              <application''',
+                  1
+              )
+              manifest.write_text(s)
+
+          main = Path("app/src/main/java/com/personalvideoai/MainActivity.kt")
+          s = main.read_text()
+
+          if 'tts?.speak(answer' not in s:
+              marker = 'chat.text = "Lotus:\\n\\n$answer"'
+              replacement = '''chat.text = "Lotus:\\n\\n$answer"
+                  tts?.speak(
+                      answer,
+                      TextToSpeech.QUEUE_FLUSH,
+                      null,
+                      "lotus_reply"
+                  )'''
+
+              if marker in s:
+                  s = s.replace(marker, replacement, 1)
+                  main.write_text(s)
+              else:
+                  raise SystemExit("TTS insertion point not found")
+
+          print("===== Lotus TTS fix applied =====")
+          grep = main.read_text()
+          print("TTS speak present:", "tts?.speak(answer" in grep)
+          print("TTS manifest present:", "TTS_SERVICE" in manifest.read_text())
+          PY
       - name: Fix text colors
         working-directory: lotus-project/PersonalVideoAI
         run: |
