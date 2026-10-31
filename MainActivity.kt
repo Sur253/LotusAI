@@ -237,7 +237,6 @@ class MainActivity : Activity() {
             if (spoken.isNotBlank()) { input.setText(spoken); input.setSelection(input.text.length); sendToAi() }
         }
     }
-
     private fun sendToAi() {
     val question = input.text.toString().trim()
 
@@ -275,18 +274,15 @@ class MainActivity : Activity() {
 
             runOnUiThread {
                 chat.text = "Lotus:\n\n$answer"
-                if (::tts.isInitialized) {
-    val ttsResult = tts.speak(
-        answer,
-        android.speech.tts.TextToSpeech.QUEUE_FLUSH,
-        null,
-        "lotus_reply"
-    )
 
-    chat.text = "Lotus:\n\n$answer\n\n🔊 TTS code: $ttsResult"
-} else {
-    chat.text = "Lotus:\n\n$answer\n\n❌ TTS not initialized"
-}
+                if (::tts.isInitialized) {
+                    tts.speak(
+                        answer,
+                        android.speech.tts.TextToSpeech.QUEUE_FLUSH,
+                        null,
+                        "lotus_reply"
+                    )
+                }
 
                 input.text.clear()
                 input.isEnabled = true
@@ -299,8 +295,7 @@ class MainActivity : Activity() {
             }
         }
     }
-    }
-                
+}   
     private fun getFileName(uri: Uri): String {
         var name = "video"
         contentResolver.query(uri, arrayOf(OpenableColumns.DISPLAY_NAME), null, null, null)?.use { if (it.moveToFirst()) name = it.getString(0) }
