@@ -66,137 +66,128 @@ class MainActivity : Activity() {
         setOnClickListener { onClick() }
     }
 
-    private fun buildUi() {
-        val scroll = ScrollView(this)
-        val root = LinearLayout(this).apply {
-            orientation = LinearLayout.VERTICAL
-            setPadding(20, 18, 20, 24)
-            setBackgroundColor(bg)
-        }
-        scroll.addView(root)
-
-        val header = LinearLayout(this).apply {
-            orientation = LinearLayout.HORIZONTAL
-            gravity = Gravity.CENTER_VERTICAL
-        }
-        val icon = ImageView(this).apply {
-            setImageResource(com.personalvideoai.R.drawable.lotus_icon)
-            scaleType = ImageView.ScaleType.CENTER_CROP
-        }
-        header.addView(icon, LinearLayout.LayoutParams(48, 48))
-        val titleBox = LinearLayout(this).apply { orientation = LinearLayout.VERTICAL; setPadding(12, 0, 0, 0) }
-        titleBox.addView(TextView(this).apply {
-            text = "LOTUS AI"
-            textSize = 23f
-            setTextColor(this@MainActivity.text)
-            typeface = android.graphics.Typeface.DEFAULT_BOLD
-        })
-        titleBox.addView(TextView(this).apply {
-            text = "Your intelligent companion"
-            textSize = 12f
-            setTextColor(muted)
-        })
-        header.addView(titleBox, LinearLayout.LayoutParams(0, -2, 1f))
-        header.addView(TextView(this).apply {
-            text = "⚙"
-            textSize = 25f
-            gravity = Gravity.CENTER
-            setTextColor(this@MainActivity.text)
-            setPadding(12, 8, 8, 8)
-            setOnClickListener { showSettings() }
-        })
-        root.addView(header)
-
-        root.addView(Space(this), LinearLayout.LayoutParams(1, 18))
-
-        val orb = FrameLayout(this).apply {
-            background = rounded(panel, Color.rgb(48, 42, 65), 32f)
-            minimumHeight = 205
-        }
-        val glow = TextView(this).apply {
-            text = "✦"
-            textSize = 92f
-            gravity = Gravity.CENTER
-            setTextColor(accent)
-            background = rounded(Color.rgb(30, 24, 46), Color.rgb(95, 73, 125), 160f)
-        }
-        orb.addView(glow, FrameLayout.LayoutParams(150, 150, Gravity.CENTER))
-        orb.addView(TextView(this).apply {
-            text = "LOTUS"
-            textSize = 13f
-            setTextColor(muted)
-            gravity = Gravity.CENTER
-        }, FrameLayout.LayoutParams(-1, -1))
-        root.addView(orb)
-
-        root.addView(TextView(this).apply {
-            text = "வணக்கம்! நான் Lotus. ✨"
-            textSize = 20f
-            setTextColor(this@MainActivity.text)
-            gravity = Gravity.CENTER
-            setPadding(0, 18, 0, 4)
-        })
-        root.addView(TextView(this).apply {
-            text = "Tamil / Tanglish-ல் பேசலாம் • Video-வை analyse செய்யலாம்"
-            textSize = 13f
-            setTextColor(muted)
-            gravity = Gravity.CENTER
-        })
-
-        videoLabel = TextView(this).apply {
-            text = "🎥  Video ready இல்லை"
-            textSize = 13f
-            setTextColor(muted)
-            setPadding(16, 12, 16, 12)
-            background = rounded(panel, Color.rgb(45, 47, 64), 18f)
-        }
-        val vp = LinearLayout.LayoutParams(-1, -2); vp.setMargins(0, 16, 0, 8)
-        root.addView(videoLabel, vp)
-
-        chat = TextView(this).apply {
-            text = "Lotus உங்களுக்காக ready.\n\n🎙️ பேசலாம்\n🎥 Video upload செய்யலாம்\n💬 கேள்வி கேட்கலாம்"
-            textSize = 16f
-            gravity = Gravity.CENTER
-            setTextColor(this@MainActivity.text)
-            setPadding(20, 24, 20, 24)
-            background = rounded(panel, Color.rgb(48, 40, 62), 24f)
-        }
-        val cp = LinearLayout.LayoutParams(-1, 180); cp.setMargins(0, 8, 0, 14)
-        root.addView(chat, cp)
-
-        val buttons = LinearLayout(this).apply { orientation = LinearLayout.HORIZONTAL }
-        val upload = pill("🎥  VIDEO") { chooseVideo() }
-        val voice = pill("🎙️  பேசு") { startVoice() }
-        buttons.addView(upload, LinearLayout.LayoutParams(0, -2, 1f).apply { setMargins(0,0,6,0) })
-        buttons.addView(voice, LinearLayout.LayoutParams(0, -2, 1f).apply { setMargins(6,0,0,0) })
-        root.addView(buttons)
-
-        input = EditText(this).apply {
-            hint = "Lotus-விடம் கேளுங்கள்..."
-            setTextColor(this@MainActivity.text)
-            setHintTextColor(Color.rgb(120, 125, 145))
-            setPadding(18, 14, 18, 14)
-            background = rounded(panel, Color.rgb(55, 58, 78), 22f)
-            minLines = 1
-            maxLines = 4
-        }
-        val ip = LinearLayout.LayoutParams(-1, -2); ip.setMargins(0, 12, 0, 8)
-        root.addView(input, ip)
-
-        val send = TextView(this).apply {
-            text = "SEND  ➜"
-            textSize = 16f
-            setTextColor(Color.BLACK)
-            gravity = Gravity.CENTER
-            typeface = android.graphics.Typeface.DEFAULT_BOLD
-            setPadding(18, 15, 18, 15)
-            background = rounded(accent, Color.TRANSPARENT, 22f)
-            setOnClickListener { sendToAi() }
-        }
-        root.addView(send)
-        setContentView(scroll)
+     
+private fun buildUi() {
+    val root = FrameLayout(this).apply {
+        setBackgroundColor(Color.BLACK)
     }
 
+    val content = LinearLayout(this).apply {
+        orientation = LinearLayout.VERTICAL
+        gravity = Gravity.CENTER_HORIZONTAL
+        setPadding(20, 80, 20, 24)
+    }
+
+    val scroll = ScrollView(this)
+    scroll.addView(content)
+
+    // Lotus logo - always visible
+    val icon = ImageView(this).apply {
+        setImageResource(com.personalvideoai.R.drawable.lotus_icon)
+        scaleType = ImageView.ScaleType.FIT_CENTER
+        contentDescription = "Lotus"
+    }
+
+    content.addView(
+        icon,
+        LinearLayout.LayoutParams(220, 220).apply {
+            gravity = Gravity.CENTER_HORIZONTAL
+        }
+    )
+
+    // AI answer below logo
+    chat = TextView(this).apply {
+        text = "வணக்கம்! நான் Lotus 🌸"
+        textSize = 17f
+        gravity = Gravity.CENTER
+        setTextColor(Color.WHITE)
+        setPadding(18, 20, 18, 20)
+        background = rounded(
+            Color.rgb(25, 18, 38),
+            Color.rgb(120, 65, 160),
+            24f
+        )
+    }
+
+    content.addView(
+        chat,
+        LinearLayout.LayoutParams(-1, -2).apply {
+            setMargins(0, 18, 0, 12)
+        }
+    )
+
+    videoLabel = TextView(this).apply {
+        text = "🎥 Video ready இல்லை"
+        textSize = 13f
+        gravity = Gravity.CENTER
+        setTextColor(Color.LTGRAY)
+        setPadding(12, 12, 12, 12)
+    }
+
+    content.addView(videoLabel)
+
+    root.addView(
+        scroll,
+        FrameLayout.LayoutParams(-1, -1)
+    )
+
+    // Three-dot menu
+    val menuButton = TextView(this).apply {
+        text = "⋮"
+        textSize = 34f
+        gravity = Gravity.CENTER
+        setTextColor(Color.WHITE)
+        background = rounded(
+            Color.rgb(35, 20, 50),
+            accent,
+            50f
+        )
+    }
+
+    val menuParams = FrameLayout.LayoutParams(
+        60, 60, Gravity.TOP or Gravity.END
+    )
+    menuParams.setMargins(0, 20, 18, 0)
+    root.addView(menuButton, menuParams)
+
+    menuButton.setOnClickListener {
+        val popup = android.widget.PopupMenu(this, menuButton)
+
+        popup.menu.add("Voice")
+        popup.menu.add("Video")
+        popup.menu.add("Ask Lotus")
+        popup.menu.add("Settings")
+
+        popup.setOnMenuItemClickListener { item ->
+            when (item.title.toString()) {
+                "Voice" -> startVoice()
+                "Video" -> chooseVideo()
+                "Ask Lotus" -> {
+                    val questionBox = EditText(this).apply {
+                        hint = "Lotus-விடம் கேளுங்கள்..."
+                        setTextColor(Color.BLACK)
+                    }
+
+                    android.app.AlertDialog.Builder(this)
+                        .setTitle("Ask Lotus")
+                        .setView(questionBox)
+                        .setPositiveButton("SEND") { _, _ ->
+                            input = questionBox
+                            sendToAi()
+                        }
+                        .setNegativeButton("CANCEL", null)
+                        .show()
+                }
+                "Settings" -> showSettings()
+            }
+            true
+        }
+
+        popup.show()
+    }
+
+    setContentView(root)
+} 
     private fun showSettings() {
         val box = LinearLayout(this).apply { orientation = LinearLayout.VERTICAL; setPadding(24, 8, 24, 0) }
         val info = TextView(this).apply { text = "Gemini API key-ஐ இங்கே save செய்யுங்கள்."; setTextColor(Color.DKGRAY) }
