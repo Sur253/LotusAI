@@ -275,7 +275,6 @@ class MainActivity : Activity() {
 
             runOnUiThread {
                 chat.text = "Lotus:\n\n$answer"
-                Toast.makeText(this, "TTS TEST", Toast.LENGTH_SHORT).show()
                 if (::tts.isInitialized) {
     val ttsResult = tts.speak(
         answer,
@@ -284,12 +283,10 @@ class MainActivity : Activity() {
         "lotus_reply"
     )
 
-    Toast.makeText(
-        this,
-        "TTS result: $ttsResult",
-        Toast.LENGTH_LONG
-    ).show()
-                }
+    chat.text = "Lotus:\n\n$answer\n\n🔊 TTS code: $ttsResult"
+} else {
+    chat.text = "Lotus:\n\n$answer\n\n❌ TTS not initialized"
+}
 
                 input.text.clear()
                 input.isEnabled = true
