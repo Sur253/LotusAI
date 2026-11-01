@@ -18,6 +18,9 @@ jobs:
         run: |
           rm -rf lotus-project
           unzip -o LotusAI-Step3-Gemini.zip -d lotus-project
+      - name: Copy MainActivity
+        run: |
+          cp MainActivity.kt lotus-project/PersonalVideoAI/app/src/main/java/com/personalvideoai/MainActivity.kt 
       - name: Fix Lotus TTS
         working-directory: lotus-project/PersonalVideoAI
         run: |
