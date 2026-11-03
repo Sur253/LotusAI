@@ -21,6 +21,12 @@ jobs:
       - name: Copy MainActivity
         run: |
           cp MainActivity.kt lotus-project/PersonalVideoAI/app/src/main/java/com/personalvideoai/MainActivity.kt 
+      - name: Check MainActivity TTS
+        run: |
+          echo "===== MainActivity TTS declarations ====="
+          grep -n "var tts" lotus-project/PersonalVideoAI/app/src/main/java/com/personalvideoai/MainActivity.kt || true
+          echo "===== MainActivity lines 265-290 ====="
+          sed -n '265,290p' lotus-project/PersonalVideoAI/app/src/main/java/com/personalvideoai/MainActivity.kt  
       - name: Fix Lotus TTS
         working-directory: lotus-project/PersonalVideoAI
         run: |
