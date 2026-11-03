@@ -27,90 +27,11 @@ jobs:
           grep -n "var tts" lotus-project/PersonalVideoAI/app/src/main/java/com/personalvideoai/MainActivity.kt || true
           echo "===== MainActivity lines 265-290 ====="
           sed -n '265,290p' lotus-project/PersonalVideoAI/app/src/main/java/com/personalvideoai/MainActivity.kt  
-      - name: Fix Lotus TTS
-        working-directory: lotus-project/PersonalVideoAI
-        run: |
-          python3 - <<'PY'
-          from pathlib import Path
-
-          manifest = Path("app/src/main/AndroidManifest.xml")
-          s = manifest.read_text()
-
-          if "android.intent.action.TTS_SERVICE" not in s:
-              s = s.replace(
-                  '    <application',
-                  '''    <queries>
-                  <intent>
-                      <action android:name="android.intent.action.TTS_SERVICE" />
-                  </intent>
-              </queries>
-
-              <application''',
-                  1
-              )
-              manifest.write_text(s)
-
-          main = Path("app/src/main/java/com/personalvideoai/MainActivity.kt")
-          s = main.read_text()
-
-          if 'tts?.speak(answer' not in s:
-              marker = 'chat.text = "Lotus:\\n\\n$answer"'
-              replacement = '''chat.text = "Lotus:\n\n$answer"
-            val voiceAnswer = answer
-               .replace(Regex("[\\x{1F300}-\\x{1FAFF}]"), "")
-               .replace(Regex("(?i)need help with anything else\\??"), "")
-               .replace(Regex("(?i)anything else I can help with\\??"), "")
-               .replace(Regex("வேற ஏதாவது உதவி வேண்டுமா\\??"), "")
-               .replace(Regex("வேறு ஏதாவது உதவி வேண்டுமா\\??"), "")
-               .replace(Regex("\\s+"), " ")
-               .trim()
-
-                  tts?.speak(
-                      voiceAnswer,
-                      TextToSpeech.QUEUE_FLUSH,
-                      null,
-                      "lotus_reply"
-                  )'''
-
-              if marker in s:
-                  s = s.replace(marker, replacement, 1)
-                  main.write_text(s)
-              else:
-                  raise SystemExit("TTS insertion point not found")
-
-          print("===== Lotus TTS fix applied =====")
-          grep = main.read_text()
-          print("TTS speak present:", "tts?.speak(answer" in grep)
-          print("TTS manifest present:", "TTS_SERVICE" in manifest.read_text())
-          PY
       - name: Fix text colors
         working-directory: lotus-project/PersonalVideoAI
         run: |
           sed -i 's/setTextColor(text)/setTextColor(android.graphics.Color.WHITE)/g' app/src/main/java/com/personalvideoai/MainActivity.kt
           sed -i 's/setTextColor(this@MainActivity.text)/setTextColor(android.graphics.Color.WHITE)/g' app/src/main/java/com/personalvideoai/MainActivity.kt
-      - name: Lotus UI and voice setup
-        working-directory: lotus-project/PersonalVideoAI
-        run: |
-          FILE="app/src/main/java/com/personalvideoai/MainActivity.kt"
-
-          sed -i 's/START_VERTICAL/VERTICAL/g' "$FILE"
-
-          sed -i '/import android.speech.RecognizerIntent/a import android.speech.tts.TextToSpeech' "$FILE"
-          sed -i '/import android.speech.tts.TextToSpeech/a import java.util.Locale' "$FILE"
-
-          sed -i '/private val executor = Executors.newSingleThreadExecutor()/a private var tts: TextToSpeech? = null' "$FILE"
-
-          sed -i 's/LinearLayout.LayoutParams(-1, 180)/LinearLayout.LayoutParams(-1, 320)/' "$FILE"
-
-          sed -i '/^[[:space:]]*buildUi()/i\
-          tts = TextToSpeech(this) { status ->\
-              if (status == TextToSpeech.SUCCESS) {\
-                  tts?.language = Locale("ta", "IN")\
-              }\
-          }' "$FILE"
-
-          echo "===== Lotus UI and voice setup applied ====="
-          grep -n "TextToSpeech\|Locale\|320" "$FILE" || true 
       - name: Lotus final UI layout
         working-directory: lotus-project/PersonalVideoAI
         run: |
