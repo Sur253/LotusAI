@@ -287,17 +287,24 @@ private fun buildUi() {
         }
     }
 }   
-    private fun getFileName(uri: Uri): String {
+        private fun getFileName(uri: Uri): String {
         var name = "video"
-        contentResolver.query(uri, arrayOf(OpenableColumns.DISPLAY_NAME), null, null, null)?.use { if (it.moveToFirst()) name = it.getString(0) }
+        contentResolver.query(
+            uri,
+            arrayOf(OpenableColumns.DISPLAY_NAME),
+            null, null, null
+        )?.use {
+            if (it.moveToFirst()) name = it.getString(0)
+        }
         return name
     }
 
     override fun onDestroy() {
-    if (::tts.isInitialized) {
-        tts.stop()
-        tts.shutdown()
+        if (::tts.isInitialized) {
+            tts.stop()
+            tts.shutdown()
+        }
+        executor.shutdownNow()
+        super.onDestroy()
     }
-    executor.shutdownNow()
-    super.onDestroy()
-    }
+}
