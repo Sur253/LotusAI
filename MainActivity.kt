@@ -30,25 +30,32 @@ class MainActivity : Activity() {
     private lateinit var tts: android.speech.tts.TextToSpeech
     private var ttsReady = false
     override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        window.statusBarColor = bg
-        window.navigationBarColor = bg
-        buildUi()
-        tts = android.speech.tts.TextToSpeech(this) { status ->
-    if (status == android.speech.tts.TextToSpeech.SUCCESS) {
-        val result = tts.setLanguage(java.util.Locale("ta", "IN"))
+    super.onCreate(savedInstanceState)
 
-        ttsReady = result != android.speech.tts.TextToSpeech.LANG_MISSING_DATA &&
-                   result != android.speech.tts.TextToSpeech.LANG_NOT_SUPPORTED
+    window.statusBarColor = bg
+    window.navigationBarColor = bg
+    buildUi()
 
-        if (!ttsReady) {
-            tts.setLanguage(java.util.Locale.US)
-            ttsReady = true
+    tts = android.speech.tts.TextToSpeech(this) { status ->
+        if (status == android.speech.tts.TextToSpeech.SUCCESS) {
+
+            var result = tts.setLanguage(java.util.Locale("ta", "IN"))
+
+            if (result == android.speech.tts.TextToSpeech.LANG_MISSING_DATA ||
+                result == android.speech.tts.TextToSpeech.LANG_NOT_SUPPORTED
+            ) {
+                result = tts.setLanguage(java.util.Locale.US)
+            }
+
+            ttsReady =
+                result != android.speech.tts.TextToSpeech.LANG_MISSING_DATA &&
+                result != android.speech.tts.TextToSpeech.LANG_NOT_SUPPORTED
+
+        } else {
+            ttsReady = false
         }
     }
-        }
-    }
-
+    }  
     private fun rounded(fill: Int, stroke: Int = Color.TRANSPARENT, radius: Float = 24f): GradientDrawable =
         GradientDrawable().apply {
             setColor(fill)
@@ -228,7 +235,8 @@ private fun buildUi() {
             if (spoken.isNotBlank()) { input.setText(spoken); input.setSelection(input.text.length); sendToAi() }
         }
     }
-    private fun sendToAi() {
+    
+private fun sendToAi() {
     val question = input.text.toString().trim()
 
     if (question.isBlank() && selectedVideo == null) {
@@ -244,7 +252,7 @@ private fun buildUi() {
         return
     }
 
-    chat.text = "Lotus யோசிக்கிறது… ⏳"
+    chat.text = "Lotus யோசிக்கிறது…"
     input.isEnabled = false
 
     val video = selectedVideo
@@ -266,13 +274,29 @@ private fun buildUi() {
             runOnUiThread {
                 chat.text = "Lotus:\n\n$answer"
 
-                if (::tts.isInitialized) {
-                    tts.speak(
+                if (::tts.isInitialized && ttsReady) {
+                    tts.setSpeechRate(1.0f)
+
+                    val speakStatus = tts.speak(
                         answer,
                         android.speech.tts.TextToSpeech.QUEUE_FLUSH,
                         null,
                         "lotus_reply"
                     )
+
+                    if (speakStatus == android.speech.tts.TextToSpeech.ERROR) {
+                        Toast.makeText(
+                            this,
+                            "Voice play ஆகவில்லை. TTS settings சரிபார்க்கவும்.",
+                            Toast.LENGTH_LONG
+                        ).show()
+                    }
+                } else {
+                    Toast.makeText(
+                        this,
+                        "Voice இன்னும் தயாராகவில்லை. மீண்டும் முயற்சி செய்யுங்கள்.",
+                        Toast.LENGTH_LONG
+                    ).show()
                 }
 
                 input.text.clear()
@@ -286,8 +310,8 @@ private fun buildUi() {
             }
         }
     }
-}   
-        private fun getFileName(uri: Uri): String {
+}
+    private fun getFileName(uri: Uri): String {
         var name = "video"
         contentResolver.query(
             uri,
