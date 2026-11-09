@@ -27,6 +27,11 @@ jobs:
           grep -n "var tts" lotus-project/PersonalVideoAI/app/src/main/java/com/personalvideoai/MainActivity.kt || true
           echo "===== MainActivity lines 265-290 ====="
           sed -n '265,290p' lotus-project/PersonalVideoAI/app/src/main/java/com/personalvideoai/MainActivity.kt  
+      - name: Verify MainActivity UI
+        run: |
+          grep -n "Lotus-விடம் கேளுங்கள்" lotus-project/PersonalVideoAI/app/src/main/java/com/personalvideoai/MainActivity.kt
+          grep -n 'val mic = pill' lotus-project/PersonalVideoAI/app/src/main/java/com/personalvideoai/MainActivity.kt
+          grep -n 'val send = pill' lotus-project/PersonalVideoAI/app/src/main/java/com/personalvideoai/MainActivity.kt
       - name: Fix text colors
         working-directory: lotus-project/PersonalVideoAI
         run: |
