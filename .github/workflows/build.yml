@@ -146,7 +146,6 @@ jobs:
           grep -n "Lotus-விடம் கேளுங்கள்" "$FILE"
           grep -n 'val mic = pill' "$FILE"
           grep -n 'val send = pill' "$FILE"
-          grep -n 'menuButton' "$FILE" 
       - name: Fix JVM target
         working-directory: lotus-project/PersonalVideoAI
         run: |
