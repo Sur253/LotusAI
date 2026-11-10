@@ -208,7 +208,7 @@ class MainActivity : Activity() {
         textSize = 18f
         setTextColor(text)
         setHintTextColor(muted)
-        singleLine = true
+        maxLines = 1
         setPadding(16, 8, 16, 8)
         background = rounded(panel, Color.rgb(75, 65, 100), 30f)
         imeOptions = android.view.inputmethod.EditorInfo.IME_ACTION_SEND
