@@ -94,10 +94,6 @@ class MainActivity : Activity() {
 
     topBar.addView(title, LinearLayout.LayoutParams(0, 55, 1f))
 
-    val menuButton = pill("⋮") {
-        val popup = PopupMenu(this, it)
-    }
-    // Menu button
     val menu = TextView(this).apply {
         text = "⋮"
         textSize = 32f
