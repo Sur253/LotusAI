@@ -72,80 +72,33 @@ class MainActivity : Activity() {
         background = rounded(panel, Color.rgb(55, 58, 78), 40f)
         setOnClickListener { onClick() }
     }
-
-     
-
-private fun buildUi() {
-    val root = FrameLayout(this).apply {
-        setBackgroundColor(Color.BLACK)
-    }
-
-    val content = LinearLayout(this).apply {
+    private fun buildUi() {
+    val root = LinearLayout(this).apply {
         orientation = LinearLayout.VERTICAL
-        gravity = Gravity.CENTER_HORIZONTAL
-        setPadding(20, 50, 20, 20)
+        setBackgroundColor(Color.rgb(8, 9, 16))
+        setPadding(18, 12, 18, 18)
     }
 
-    val scroll = ScrollView(this)
-    scroll.addView(content)
-
-    val icon = ImageView(this).apply {
-        setImageResource(com.personalvideoai.R.drawable.lotus_icon)
-        scaleType = ImageView.ScaleType.FIT_CENTER
-        contentDescription = "Lotus"
-    }
-
-    content.addView(icon, LinearLayout.LayoutParams(220, 220))
-
-    chat = TextView(this).apply {
-        text = "Lotus ready."
-        textSize = 17f
-        gravity = Gravity.CENTER
-        setTextColor(Color.WHITE)
-        setPadding(16, 18, 16, 18)
-        background = rounded(Color.rgb(20, 15, 30), accent, 24f)
-    }
-
-    content.addView(chat, LinearLayout.LayoutParams(-1, 110))
-
-    videoLabel = TextView(this).apply {
-        visibility = View.GONE
-    }
-
-    content.addView(videoLabel)
-
-    val spacer = Space(this)
-    content.addView(spacer, LinearLayout.LayoutParams(1, 20, 1f))
-
-    val bottom = LinearLayout(this).apply {
+    // TOP BAR
+    val topBar = LinearLayout(this).apply {
         orientation = LinearLayout.HORIZONTAL
         gravity = Gravity.CENTER_VERTICAL
     }
 
-    val mic = pill("🎙") { startVoice() }
-    bottom.addView(mic, LinearLayout.LayoutParams(55, 55))
-
-    input = EditText(this).apply {
-        hint = "Lotus-விடம் கேளுங்கள்..."
-        setTextColor(Color.WHITE)
-        setHintTextColor(Color.LTGRAY)
-        setPadding(14, 10, 14, 10)
-        background = rounded(panel, accent, 22f)
-        maxLines = 3
+    val title = TextView(this).apply {
+        text = "LOTUS AI"
+        textSize = 19f
+        setTextColor(accent)
+        letterSpacing = 0.16f
     }
 
-    bottom.addView(input, LinearLayout.LayoutParams(0, -2, 1f).apply {
-        setMargins(8, 0, 8, 0)
-    })
+    topBar.addView(title, LinearLayout.LayoutParams(0, 55, 1f))
 
-    val send = pill("➤") { sendToAi() }
-    bottom.addView(send, LinearLayout.LayoutParams(55, 55))
-
-    content.addView(bottom)
-
-    root.addView(scroll, FrameLayout.LayoutParams(-1, -1))
-
-    val menuButton = TextView(this).apply {
+    val menuButton = pill("⋮") {
+        val popup = PopupMenu(this, it)
+    }
+    // Menu button
+    val menu = TextView(this).apply {
         text = "⋮"
         textSize = 32f
         gravity = Gravity.CENTER
@@ -153,13 +106,11 @@ private fun buildUi() {
         background = rounded(panel, accent, 50f)
     }
 
-    val params = FrameLayout.LayoutParams(55, 55, Gravity.TOP or Gravity.END)
-    params.setMargins(0, 15, 15, 0)
-    root.addView(menuButton, params)
+    topBar.addView(menu, LinearLayout.LayoutParams(52, 52))
+    root.addView(topBar)
 
-    menuButton.setOnClickListener {
-        val popup = android.widget.PopupMenu(this, menuButton)
-
+    menu.setOnClickListener {
+        val popup = PopupMenu(this, menu)
         popup.menu.add("Live Search")
         popup.menu.add("Live Voice Chat")
         popup.menu.add("Voice Reply")
@@ -168,17 +119,100 @@ private fun buildUi() {
 
         popup.setOnMenuItemClickListener { item ->
             when (item.title.toString()) {
-                "Live Search" -> Toast.makeText(this, "Live Search setup pending", Toast.LENGTH_SHORT).show()
+                "Live Search" ->
+                    Toast.makeText(this, "Live Search setup pending", Toast.LENGTH_SHORT).show()
                 "Live Voice Chat" -> startVoice()
-                "Voice Reply" -> Toast.makeText(this, "Voice Reply setting", Toast.LENGTH_SHORT).show()
+                "Voice Reply" ->
+                    Toast.makeText(this, "Voice Reply setting", Toast.LENGTH_SHORT).show()
                 "Video" -> chooseVideo()
                 "Settings" -> showSettings()
             }
             true
         }
-
         popup.show()
     }
+
+    // CENTER AREA
+    val center = FrameLayout(this)
+
+    val icon = ImageView(this).apply {
+        setImageResource(com.personalvideoai.R.drawable.lotus_icon)
+        scaleType = ImageView.ScaleType.FIT_CENTER
+        contentDescription = "Lotus AI"
+    }
+
+    center.addView(
+        icon,
+        FrameLayout.LayoutParams(250, 250, Gravity.CENTER)
+    )
+
+    chat = TextView(this).apply {
+        text = ""
+        textSize = 15f
+        gravity = Gravity.CENTER
+        setTextColor(Color.WHITE)
+        setPadding(16, 12, 16, 12)
+        background = rounded(panel, accent, 22f)
+        visibility = View.GONE
+    }
+
+    val chatParams = FrameLayout.LayoutParams(
+        -1, -2, Gravity.BOTTOM
+    )
+    chatParams.setMargins(0, 0, 0, 18)
+    center.addView(chat, chatParams)
+
+    videoLabel = TextView(this).apply {
+        textSize = 12f
+        setTextColor(muted)
+        visibility = View.GONE
+    }
+
+    root.addView(
+        center,
+        LinearLayout.LayoutParams(-1, 0, 1f)
+    )
+
+    root.addView(videoLabel)
+
+    // BOTTOM INPUT BAR
+    val bottom = LinearLayout(this).apply {
+        orientation = LinearLayout.HORIZONTAL
+        gravity = Gravity.CENTER_VERTICAL
+        setPadding(0, 10, 0, 4)
+    }
+
+    val mic = pill("🎙") {
+        startVoice()
+    }
+
+    bottom.addView(mic, LinearLayout.LayoutParams(54, 54))
+
+    input = EditText(this).apply {
+        hint = "Lotus-விடம் கேளுங்கள்..."
+        textSize = 15f
+        setTextColor(Color.WHITE)
+        setHintTextColor(muted)
+        setSingleLine(false)
+        maxLines = 3
+        setPadding(15, 12, 15, 12)
+        background = rounded(panel, accent, 24f)
+    }
+
+    bottom.addView(
+        input,
+        LinearLayout.LayoutParams(0, -2, 1f).apply {
+            setMargins(9, 0, 9, 0)
+        }
+    )
+
+    val send = pill("➤") {
+        sendToAi()
+    }
+
+    bottom.addView(send, LinearLayout.LayoutParams(54, 54))
+
+    root.addView(bottom)
 
     setContentView(root)
 }
