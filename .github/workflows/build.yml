@@ -138,6 +138,15 @@ jobs:
           sed -i 's/private val model = "gemini-3.8-flash"/private val model = "gemini-3.6-flash"/' "$FILE"
           echo "===== Gemini fallback model ====="
           grep -n "private val model" "$FILE"  
+      - name: Final UI verification
+        working-directory: lotus-project/PersonalVideoAI
+        run: |
+          FILE="app/src/main/java/com/personalvideoai/MainActivity.kt"
+          echo "===== FINAL UI CHECK ====="
+          grep -n "Lotus-விடம் கேளுங்கள்" "$FILE"
+          grep -n 'val mic = pill' "$FILE"
+          grep -n 'val send = pill' "$FILE"
+          grep -n 'menuButton' "$FILE" 
       - name: Fix JVM target
         working-directory: lotus-project/PersonalVideoAI
         run: |
