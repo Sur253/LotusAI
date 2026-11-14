@@ -138,7 +138,20 @@ class MainActivity : Activity() {
 
     // CENTER AREA
     val center = FrameLayout(this)
-    root.addView(
+    val backgroundImage = ImageView(this).apply {
+    setImageResource(R.drawable.lotus_background)
+    scaleType = ImageView.ScaleType.CENTER_CROP
+    alpha = 0.95f
+}
+
+center.addView(
+    backgroundImage,
+    FrameLayout.LayoutParams(
+        FrameLayout.LayoutParams.MATCH_PARENT,
+        FrameLayout.LayoutParams.MATCH_PARENT
+    )
+)
+        root.addView(
         center,
         LinearLayout.LayoutParams(
             LinearLayout.LayoutParams.MATCH_PARENT,
