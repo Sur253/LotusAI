@@ -147,20 +147,6 @@ class MainActivity : Activity() {
         )
     )
 
-    val logo = ImageView(this).apply {
-        setImageResource(R.drawable.lotus_icon)
-        scaleType = ImageView.ScaleType.FIT_CENTER
-        adjustViewBounds = true
-    }
-
-    val logoSize = (resources.displayMetrics.widthPixels * 0.68f).toInt()
-        .coerceAtMost((resources.displayMetrics.heightPixels * 0.42f).toInt())
-
-    center.addView(
-        logo,
-        FrameLayout.LayoutParams(logoSize, logoSize, Gravity.CENTER)
-    )
-
     // CHAT RESPONSE
     chat = TextView(this).apply {
         text = ""
