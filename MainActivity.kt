@@ -83,7 +83,7 @@ class MainActivity : Activity() {
     val root = LinearLayout(this).apply {
         orientation = LinearLayout.VERTICAL
         setBackgroundColor(bg)
-        setPadding(16, 28, 16, 110)
+        setPadding(16, 28, 16, 200)
     }
 
     // TOP BAR
