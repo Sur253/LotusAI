@@ -33,6 +33,21 @@ class GeminiClient(private val context: Context) {
         return generate(apiKey, prompt, null, null)
     }
 
+    fun chatWithSearch(apiKey: String, question: String): String {
+        val prompt = """
+        You are Lotus, a friendly South Indian female AI assistant.
+        Reply naturally in Tamil or Tanglish.
+        Use Google Search for current information, latest news,
+        weather, prices, events and recent facts.
+        Give accurate answers based on search results.
+        Never invent current information.
+        User question:
+        $question
+    """.trimIndent()
+
+    return generate(apiKey, prompt, null, null, enableSearch = true)
+}
+
     fun askAboutVideo(apiKey: String, videoUri: Uri, question: String): String {
         val uploaded = uploadVideo(apiKey, videoUri)
         val fileUri = uploaded.first
@@ -51,7 +66,13 @@ class GeminiClient(private val context: Context) {
         return generate(apiKey, prompt, fileUri, mime)
     }
 
-    private fun generate(apiKey: String, prompt: String, fileUri: String?, mime: String?): String {
+    private fun generate(
+    apiKey: String,
+    prompt: String,
+    fileUri: String?,
+    mime: String?,
+    enableSearch: Boolean = false
+): String {
         val parts = JSONArray()
         parts.put(JSONObject().put("text", prompt))
 
@@ -87,7 +108,8 @@ class GeminiClient(private val context: Context) {
                 ?: throw IOException("AI response-ல் candidates இல்லை.")
             if (candidates.length() == 0) throw IOException("AI response empty.")
 
-            val content = candidates.getJSONObject(0).optJSONObject("content")
+            val candidate = candidates.getJSONObject(0)
+val content = candidate.optJSONObject("content")
                 ?: throw IOException("AI content கிடைக்கவில்லை.")
             val partsOut = content.optJSONArray("parts") ?: JSONArray()
             val answer = StringBuilder()
@@ -96,10 +118,42 @@ class GeminiClient(private val context: Context) {
                 val t = p.optString("text", "")
                 if (t.isNotBlank()) answer.append(t)
             }
-            return answer.toString().trim().ifBlank { "AI பதில் கிடைக்கவில்லை." }
+            val answerText = answer.toString().trim()
+                .ifBlank { "AI பதில் கிடைக்கவில்லை." }
+
+            if (!enableSearch) return answerText
+
+           val chunks = candidate
+           .optJSONObject("groundingMetadata")
+           ?.optJSONArray("groundingChunks") ?: JSONArray()
+
+           val sources = linkedMapOf<String, String>()
+
+        for (i in 0 until chunks.length()) {
+           val web = chunks.optJSONObject(i)?.optJSONObject("web") ?: continue
+           val title = web.optString("title")
+           val url = web.optString("uri")
+
+        if (url.startsWith("https://") || url.startsWith("http://")) {
+           sources[url] = title.ifBlank { url }
+    }
+}
+
+        if (sources.isEmpty()) return answerText
+
+        return answerText + "\n\nஆதாரங்கள்:\n" +
+           sources.entries.joinToString("\n") { "${it.value}\n${it.key}" }
         }
     }
 
+ if (enableSearch) {
+    body.put(
+        "tools",
+        JSONArray().put(
+            JSONObject().put("google_search", JSONObject())
+        )
+    )
+ }  
     private fun uploadVideo(apiKey: String, uri: Uri): Pair<String, String> {
         val resolver = context.contentResolver
         val mime = resolver.getType(uri) ?: "video/mp4"
