@@ -92,14 +92,6 @@ class MainActivity : Activity() {
         gravity = Gravity.CENTER_VERTICAL
     }
 
-    val title = TextView(this).apply {
-        text = "LOTUS AI"
-        textSize = 25f
-        setTextColor(accent)
-        setTypeface(null, android.graphics.Typeface.BOLD)
-        letterSpacing = 0.12f
-    }
-
     val topSpace = Space(this)
     val menu = TextView(this).apply {
         text = "⋮"
@@ -131,7 +123,6 @@ class MainActivity : Activity() {
         }
     }
 
-    topBar.addView(title)
     topBar.addView(topSpace, LinearLayout.LayoutParams(0, 1, 1f))
     topBar.addView(menu)
     root.addView(topBar)
