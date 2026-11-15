@@ -319,14 +319,20 @@ private fun sendToAi() {
                 if (::tts.isInitialized && ttsReady) {
                     tts.setSpeechRate(1.0f)
 
-                    val speakStatus = tts.speak(
-                        answer,
-                        android.speech.tts.TextToSpeech.QUEUE_FLUSH,
-                        null,
-                        "lotus_reply"
-                    )
+                    val speechAnswer = answer
+    .replace(Regex("[\\p{So}\\p{Sk}\\p{Cn}]"), "")
+    .replace(Regex("[*#_`~]"), "")
+    .replace(Regex("\\s+"), " ")
+    .trim()
 
-                    if (speakStatus == android.speech.tts.TextToSpeech.ERROR) {
+val speakStatus = tts.speak(
+    speechAnswer,
+    android.speech.tts.TextToSpeech.QUEUE_FLUSH,
+    null,
+    "lotus_reply"
+)
+
+                  if (speakStatus == android.speech.tts.TextToSpeech.ERROR) {
                         Toast.makeText(
                             this,
                             "Voice play ஆகவில்லை. TTS settings சரிபார்க்கவும்.",
