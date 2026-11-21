@@ -335,6 +335,7 @@ private fun sendToAi() {
     }
 
     chat.text = "Lotus யோசிக்கிறது…"
+    chat.visibility = View.VISIBLE
     input.isEnabled = false
 
     val video = selectedVideo
