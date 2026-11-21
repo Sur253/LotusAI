@@ -65,96 +65,110 @@ class GeminiClient(private val context: Context) {
 
         return generate(apiKey, prompt, fileUri, mime)
     }
-
-    private fun generate(
+   private fun generate(
     apiKey: String,
     prompt: String,
     fileUri: String?,
     mime: String?,
     enableSearch: Boolean = false
 ): String {
-        val parts = JSONArray()
-        parts.put(JSONObject().put("text", prompt))
+    val parts = JSONArray()
+    parts.put(JSONObject().put("text", prompt))
 
-        if (fileUri != null && mime != null) {
-            parts.put(
-                JSONObject().put(
-                    "file_data",
-                    JSONObject()
-                        .put("mime_type", mime)
-                        .put("file_uri", fileUri)
-                )
+    if (fileUri != null && mime != null) {
+        parts.put(
+            JSONObject().put(
+                "file_data",
+                JSONObject()
+                    .put("mime_type", mime)
+                    .put("file_uri", fileUri)
             )
+        )
+    }
+
+    val body = JSONObject().put(
+        "contents",
+        JSONArray().put(
+            JSONObject().put("parts", parts)
+        )
+    )
+
+    if (enableSearch) {
+        body.put(
+            "tools",
+            JSONArray().put(
+                JSONObject().put("google_search", JSONObject())
+            )
+        )
+    }
+
+    val request = Request.Builder()
+        .url("https://generativelanguage.googleapis.com/v1beta/models/$model:generateContent")
+        .addHeader("x-goog-api-key", apiKey)
+        .addHeader("Content-Type", "application/json")
+        .post(body.toString().toRequestBody(jsonType))
+        .build()
+
+    client.newCall(request).execute().use { response ->
+        val responseText = response.body?.string().orEmpty()
+
+        if (!response.isSuccessful) {
+            throw IOException(parseError(responseText, response.code))
         }
 
-        val body = JSONObject().put(
-            "contents",
-            JSONArray().put(JSONObject().put("parts", parts))
-        )
+        val root = JSONObject(responseText)
+        val candidates = root.optJSONArray("candidates")
+            ?: throw IOException("AI response-ல் candidates இல்லை.")
 
-        val request = Request.Builder()
-            .url("https://generativelanguage.googleapis.com/v1beta/models/$model:generateContent")
-            .addHeader("x-goog-api-key", apiKey)
-            .addHeader("Content-Type", "application/json")
-            .post(body.toString().toRequestBody(jsonType))
-            .build()
+        if (candidates.length() == 0) {
+            throw IOException("AI response empty.")
+        }
 
-        client.newCall(request).execute().use { response ->
-            val text = response.body?.string().orEmpty()
-            if (!response.isSuccessful) throw IOException(parseError(text, response.code))
+        val candidate = candidates.getJSONObject(0)
+        val content = candidate.optJSONObject("content")
+            ?: throw IOException("AI content கிடைக்கவில்லை.")
 
-            val root = JSONObject(text)
-            val candidates = root.optJSONArray("candidates")
-                ?: throw IOException("AI response-ல் candidates இல்லை.")
-            if (candidates.length() == 0) throw IOException("AI response empty.")
+        val partsOut = content.optJSONArray("parts") ?: JSONArray()
+        val answer = StringBuilder()
 
-            val candidate = candidates.getJSONObject(0)
-val content = candidate.optJSONObject("content")
-                ?: throw IOException("AI content கிடைக்கவில்லை.")
-            val partsOut = content.optJSONArray("parts") ?: JSONArray()
-            val answer = StringBuilder()
-            for (i in 0 until partsOut.length()) {
-                val p = partsOut.optJSONObject(i) ?: continue
-                val t = p.optString("text", "")
-                if (t.isNotBlank()) answer.append(t)
-            }
-            val answerText = answer.toString().trim()
-                .ifBlank { "AI பதில் கிடைக்கவில்லை." }
+        for (i in 0 until partsOut.length()) {
+            val p = partsOut.optJSONObject(i) ?: continue
+            val t = p.optString("text", "")
+            if (t.isNotBlank()) answer.append(t)
+        }
 
-            if (!enableSearch) return answerText
+        val answerText = answer.toString().trim()
+            .ifBlank { "AI பதில் கிடைக்கவில்லை." }
 
-           val chunks = candidate
-           .optJSONObject("groundingMetadata")
-           ?.optJSONArray("groundingChunks") ?: JSONArray()
+        if (!enableSearch) return answerText
 
-           val sources = linkedMapOf<String, String>()
+        val chunks = candidate
+            .optJSONObject("groundingMetadata")
+            ?.optJSONArray("groundingChunks") ?: JSONArray()
+
+        val sources = linkedMapOf<String, String>()
 
         for (i in 0 until chunks.length()) {
-           val web = chunks.optJSONObject(i)?.optJSONObject("web") ?: continue
-           val title = web.optString("title")
-           val url = web.optString("uri")
+            val web = chunks.optJSONObject(i)
+                ?.optJSONObject("web") ?: continue
 
-        if (url.startsWith("https://") || url.startsWith("http://")) {
-           sources[url] = title.ifBlank { url }
-    }
-}
+            val title = web.optString("title")
+            val url = web.optString("uri")
+
+            if (url.startsWith("https://") || url.startsWith("http://")) {
+                sources[url] = title.ifBlank { url }
+            }
+        }
 
         if (sources.isEmpty()) return answerText
 
         return answerText + "\n\nஆதாரங்கள்:\n" +
-           sources.entries.joinToString("\n") { "${it.value}\n${it.key}" }
-        }
+            sources.entries.joinToString("\n") {
+                "${it.value}\n${it.key}"
+            }
     }
-
- if (enableSearch) {
-    body.put(
-        "tools",
-        JSONArray().put(
-            JSONObject().put("google_search", JSONObject())
-        )
-    )
- }  
-    private fun uploadVideo(apiKey: String, uri: Uri): Pair<String, String> {
+}
+  private fun uploadVideo(apiKey: String, uri: Uri): Pair<String, String> {
         val resolver = context.contentResolver
         val mime = resolver.getType(uri) ?: "video/mp4"
         val size = getSize(uri)
