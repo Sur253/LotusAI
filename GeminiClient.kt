@@ -168,7 +168,75 @@ class GeminiClient(private val context: Context) {
             }
     }
 }
-  private fun uploadVideo(apiKey: String, uri: Uri): Pair<String, String> {
+
+fun searchTamilYouTube(query: String): String {
+    val prefs = context.getSharedPreferences("lotus", Context.MODE_PRIVATE)
+    val youtubeKey = prefs.getString("youtube_api_key", "")
+        ?.trim().orEmpty()
+
+    if (youtubeKey.isBlank()) {
+        throw IOException("Settings-ல் YouTube API Key save செய்யுங்கள்.")
+    }
+
+    val url = Uri.parse("https://www.googleapis.com/youtube/v3/search")
+        .buildUpon()
+        .appendQueryParameter("part", "snippet")
+        .appendQueryParameter("type", "video")
+        .appendQueryParameter("maxResults", "5")
+        .appendQueryParameter("order", "date")
+        .appendQueryParameter("regionCode", "IN")
+        .appendQueryParameter("relevanceLanguage", "ta")
+        .appendQueryParameter("q", "$query Tamil news")
+        .appendQueryParameter("key", youtubeKey)
+        .build()
+        .toString()
+
+    val request = Request.Builder()
+        .url(url)
+        .get()
+        .build()
+
+    client.newCall(request).execute().use { response ->
+        val responseText = response.body?.string().orEmpty()
+
+        if (!response.isSuccessful) {
+            throw IOException("YouTube API error: ${response.code} - $responseText")
+        }
+
+        val root = JSONObject(responseText)
+        val items = root.optJSONArray("items")
+            ?: throw IOException("YouTube results கிடைக்கவில்லை.")
+
+        if (items.length() == 0) {
+            return "தமிழ் செய்தி வீடியோக்கள் கிடைக்கவில்லை."
+        }
+
+        val result = StringBuilder()
+        result.append("சமீபத்திய தமிழ் YouTube செய்திகள்:\n\n")
+
+        for (i in 0 until items.length()) {
+            val item = items.getJSONObject(i)
+            val snippet = item.getJSONObject("snippet")
+            val videoId = item.getJSONObject("id")
+                .optString("videoId")
+
+            if (videoId.isBlank()) continue
+
+            val title = snippet.optString("title")
+            val channel = snippet.optString("channelTitle")
+            val date = snippet.optString("publishedAt")
+            val link = "https://www.youtube.com/watch?v=$videoId"
+
+            result.append("${i + 1}. $title\n")
+            result.append("சேனல்: $channel\n")
+            result.append("தேதி: $date\n")
+            result.append("வீடியோ: $link\n\n")
+        }
+
+        return result.toString().trim()
+    }
+}
+    private fun uploadVideo(apiKey: String, uri: Uri): Pair<String, String> {
         val resolver = context.contentResolver
         val mime = resolver.getType(uri) ?: "video/mp4"
         val size = getSize(uri)
