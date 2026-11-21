@@ -350,7 +350,7 @@ private fun sendToAi() {
                     }
                 )
             } else {
-                GeminiClient(this).chat(key, question)
+                GeminiClient(this).chatWithSearch(key, question)
             }
 
             runOnUiThread {
