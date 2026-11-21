@@ -237,20 +237,60 @@ center.addView(
 
     setContentView(root)
 }
-     private fun showSettings() {
-        val box = LinearLayout(this).apply { orientation = LinearLayout.VERTICAL; setPadding(24, 8, 24, 0) }
-        val info = TextView(this).apply { text = "Gemini API key-ஐ இங்கே save செய்யுங்கள்."; setTextColor(Color.DKGRAY) }
-        val key = EditText(this).apply {
-            hint = "AIza..."
-            inputType = android.text.InputType.TYPE_CLASS_TEXT or android.text.InputType.TYPE_TEXT_VARIATION_PASSWORD
-            setText(prefs.getString("api_key", ""))
-        }
-        box.addView(info); box.addView(key)
-        AlertDialog.Builder(this).setTitle("Lotus AI Settings").setView(box)
-            .setPositiveButton("SAVE") { _, _ -> prefs.edit().putString("api_key", key.text.toString().trim()).apply(); Toast.makeText(this, "API key saved", Toast.LENGTH_SHORT).show() }
-            .setNegativeButton("CANCEL", null).show()
+     
+private fun showSettings() {
+    val box = LinearLayout(this).apply {
+        orientation = LinearLayout.VERTICAL
+        setPadding(24, 8, 24, 0)
     }
 
+    val geminiInfo = TextView(this).apply {
+        text = "Gemini API Key"
+        setTextColor(Color.DKGRAY)
+    }
+
+    val geminiKey = EditText(this).apply {
+        hint = "Gemini API key"
+        inputType = android.text.InputType.TYPE_CLASS_TEXT or
+            android.text.InputType.TYPE_TEXT_VARIATION_PASSWORD
+        setText(prefs.getString("api_key", ""))
+    }
+
+    val youtubeInfo = TextView(this).apply {
+        text = "YouTube Data API Key"
+        setTextColor(Color.DKGRAY)
+    }
+
+    val youtubeKey = EditText(this).apply {
+        hint = "YouTube API key"
+        inputType = android.text.InputType.TYPE_CLASS_TEXT or
+            android.text.InputType.TYPE_TEXT_VARIATION_PASSWORD
+        setText(prefs.getString("youtube_api_key", ""))
+    }
+
+    box.addView(geminiInfo)
+    box.addView(geminiKey)
+    box.addView(youtubeInfo)
+    box.addView(youtubeKey)
+
+    AlertDialog.Builder(this)
+        .setTitle("Lotus AI Settings")
+        .setView(box)
+        .setPositiveButton("SAVE") { _, _ ->
+            prefs.edit()
+                .putString("api_key", geminiKey.text.toString().trim())
+                .putString("youtube_api_key", youtubeKey.text.toString().trim())
+                .apply()
+
+            Toast.makeText(
+                this,
+                "API keys saved",
+                Toast.LENGTH_SHORT
+            ).show()
+        }
+        .setNegativeButton("CANCEL", null)
+        .show()
+}
     private fun chooseVideo() {
         startActivityForResult(Intent(Intent.ACTION_OPEN_DOCUMENT).apply { type = "video/*"; addCategory(Intent.CATEGORY_OPENABLE) }, 10)
     }
