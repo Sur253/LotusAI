@@ -101,9 +101,13 @@ class GeminiClient(private val context: Context) {
             )
         )
     }
-
+val requestModel = if (enableSearch) {
+    "gemini-2.5-flash"
+} else {
+    model
+}
     val request = Request.Builder()
-        .url("https://generativelanguage.googleapis.com/v1beta/models/$model:generateContent")
+        .url("https://generativelanguage.googleapis.com/v1beta/models/$requestmodel:generateContent")
         .addHeader("x-goog-api-key", apiKey)
         .addHeader("Content-Type", "application/json")
         .post(body.toString().toRequestBody(jsonType))
