@@ -267,12 +267,23 @@ private fun showSettings() {
             android.text.InputType.TYPE_TEXT_VARIATION_PASSWORD
         setText(prefs.getString("youtube_api_key", ""))
     }
+val tavilyInfo = TextView(this).apply {
+    text = "Tavily Search API Key"
+    setTextColor(Color.DKGRAY)
+}
 
+val tavilyKey = EditText(this).apply {
+    hint = "Tavily API key"
+    inputType = android.text.InputType.TYPE_CLASS_TEXT or
+        android.text.InputType.TYPE_TEXT_VARIATION_PASSWORD
+    setText(prefs.getString("tavily_api_key", ""))
+}
     box.addView(geminiInfo)
     box.addView(geminiKey)
     box.addView(youtubeInfo)
     box.addView(youtubeKey)
-
+    box.addView(tavilyInfo)
+    box.addView(tavilyKey)
     AlertDialog.Builder(this)
         .setTitle("Lotus AI Settings")
         .setView(box)
@@ -280,6 +291,7 @@ private fun showSettings() {
             prefs.edit()
                 .putString("api_key", geminiKey.text.toString().trim())
                 .putString("youtube_api_key", youtubeKey.text.toString().trim())
+                .putString("tavily_api_key", tavilyKey.text.toString().trim())
                 .apply()
 
             Toast.makeText(
