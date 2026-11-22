@@ -34,6 +34,7 @@ class GeminiClient(private val context: Context) {
     }
 
     
+
 fun chatWithSearch(apiKey: String, question: String): String {
     val tavilyKey = context
         .getSharedPreferences("lotus", Context.MODE_PRIVATE)
@@ -44,31 +45,65 @@ fun chatWithSearch(apiKey: String, question: String): String {
         throw IOException("Settings-ல் Tavily API key save செய்யுங்கள்.")
     }
 
-    val searchResults = searchTavily(tavilyKey, question)
+    val searchQuery = """
+        $question
+        Tamil Nadu India latest breaking news today.
+        Local district news from all 38 districts of Tamil Nadu.
+        Chennai, Coimbatore, Madurai, Sivaganga, Ramanathapuram,
+        Tiruchirappalli, Salem, Thanjavur, Tirunelveli,
+        Kanyakumari, Dindigul, Theni, Virudhunagar,
+        Thoothukudi, Erode, Tiruppur and all other districts.
+        District local news, politics, accidents, crime,
+        education, agriculture, jobs, government announcements.
+    """.trimIndent()
+
+    val searchResults = searchTavily(tavilyKey, searchQuery)
 
     val prompt = """
-        You are Lotus, a friendly South Indian female AI assistant.
-        Reply naturally in Tamil or Tanglish.
-        Answer using the latest web search results below.
-        Never invent facts that are not supported by the results.
-        Include useful source URLs in your answer.
+        You are Lotus, a Tamil-speaking AI news assistant.
+
+        Reply in natural Tamil.
+        Give detailed news, not just headlines.
+
+        Prioritize news from ALL 38 districts of Tamil Nadu.
+        Include district name, news headline, date,
+        what happened and available details.
+
+        Also cover:
+        1. Tamil Nadu state news and politics
+        2. District local news
+        3. India national news
+        4. International headlines and detailed world news
+           from USA, UK, Europe, China, Russia, Japan,
+           Middle East, Asia and other countries.
+           Include international politics, wars, economy,
+           technology, science and major world events.
+        5. Business and economy
+        6. Sports
+        7. Technology and science
+        8. Cinema and entertainment
+        9. Weather and government announcements
+
+        Do not invent news or district reports.
+        If a district has no relevant search result,
+        do not create a fake news story for that district.
+        Mention that available search results are limited.
+        Include source URLs for the news.
 
         User question:
         $question
 
-        Web search results:
+        Latest web search results:
         $searchResults
     """.trimIndent()
 
     return generate(apiKey, prompt, null, null)
 }
-    
- 
-private fun searchTavily(apiKey: String, question: String): String {
+ private fun searchTavily(apiKey: String, question: String): String {
     val body = JSONObject()
         .put("query", question)
         .put("search_depth", "basic")
-        .put("max_results", 5)
+        .put("max_results", 10)
         .put("include_answer", false)
 
     val request = Request.Builder()
