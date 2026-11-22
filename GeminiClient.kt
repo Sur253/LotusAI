@@ -63,6 +63,57 @@ fun chatWithSearch(apiKey: String, question: String): String {
     return generate(apiKey, prompt, null, null)
 }
     
+ 
+private fun searchTavily(apiKey: String, question: String): String {
+    val body = JSONObject()
+        .put("query", question)
+        .put("search_depth", "basic")
+        .put("max_results", 5)
+        .put("include_answer", false)
+
+    val request = Request.Builder()
+        .url("https://api.tavily.com/search")
+        .addHeader("Authorization", "Bearer $apiKey")
+        .addHeader("Content-Type", "application/json")
+        .post(body.toString().toRequestBody(jsonType))
+        .build()
+
+    client.newCall(request).execute().use { response ->
+        val responseText = response.body?.string().orEmpty()
+
+        if (!response.isSuccessful) {
+            throw IOException("Tavily Search Error: ${response.code} - $responseText")
+        }
+
+        val root = JSONObject(responseText)
+        val results = root.optJSONArray("results")
+            ?: throw IOException("Tavily search results கிடைக்கவில்லை.")
+
+        if (results.length() == 0) {
+            throw IOException("Search results எதுவும் கிடைக்கவில்லை.")
+        }
+
+        val output = StringBuilder()
+
+        for (i in 0 until results.length()) {
+            val item = results.optJSONObject(i) ?: continue
+
+            output.append("Title: ")
+                .append(item.optString("title"))
+                .append("\n")
+
+            output.append("Content: ")
+                .append(item.optString("content"))
+                .append("\n")
+
+            output.append("Source: ")
+                .append(item.optString("url"))
+                .append("\n\n")
+        }
+
+        return output.toString()
+    }
+}
     fun askAboutVideo(apiKey: String, videoUri: Uri, question: String): String {
         val uploaded = uploadVideo(apiKey, videoUri)
         val fileUri = uploaded.first
@@ -85,7 +136,6 @@ fun chatWithSearch(apiKey: String, question: String): String {
     prompt: String,
     fileUri: String?,
     mime: String?,
-    enableSearch: Boolean = false
 ): String {
     val parts = JSONArray()
     parts.put(JSONObject().put("text", prompt))
@@ -107,20 +157,7 @@ fun chatWithSearch(apiKey: String, question: String): String {
             JSONObject().put("parts", parts)
         )
     )
-
-    if (enableSearch) {
-        body.put(
-            "tools",
-            JSONArray().put(
-                JSONObject().put("google_search", JSONObject())
-            )
-        )
-    }
-val requestModel = if (enableSearch) {
-    "gemini-2.5-flash"
-} else {
-    model
-}
+    val requestModel = model
     val request = Request.Builder()
         .url("https://generativelanguage.googleapis.com/v1beta/models/$requestModel:generateContent")
         .addHeader("x-goog-api-key", apiKey)
@@ -155,38 +192,6 @@ val requestModel = if (enableSearch) {
             val t = p.optString("text", "")
             if (t.isNotBlank()) answer.append(t)
         }
-
-        val answerText = answer.toString().trim()
-            .ifBlank { "AI பதில் கிடைக்கவில்லை." }
-
-        if (!enableSearch) return answerText
-
-        val chunks = candidate
-            .optJSONObject("groundingMetadata")
-            ?.optJSONArray("groundingChunks") ?: JSONArray()
-
-        val sources = linkedMapOf<String, String>()
-
-        for (i in 0 until chunks.length()) {
-            val web = chunks.optJSONObject(i)
-                ?.optJSONObject("web") ?: continue
-
-            val title = web.optString("title")
-            val url = web.optString("uri")
-
-            if (url.startsWith("https://") || url.startsWith("http://")) {
-                sources[url] = title.ifBlank { url }
-            }
-        }
-
-        if (sources.isEmpty()) return answerText
-
-        return answerText + "\n\nஆதாரங்கள்:\n" +
-            sources.entries.joinToString("\n") {
-                "${it.value}\n${it.key}"
-            }
-    }
-}
 
 fun searchTamilYouTube(query: String): String {
     val prefs = context.getSharedPreferences("lotus", Context.MODE_PRIVATE)
