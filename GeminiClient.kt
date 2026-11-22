@@ -192,7 +192,12 @@ private fun searchTavily(apiKey: String, question: String): String {
             val t = p.optString("text", "")
             if (t.isNotBlank()) answer.append(t)
         }
+        val answerText = answer.toString().trim()
+            .ifBlank { "AI பதில் கிடைக்கவில்லை." }
 
+        return answerText
+    }
+   }
 fun searchTamilYouTube(query: String): String {
     val prefs = context.getSharedPreferences("lotus", Context.MODE_PRIVATE)
     val youtubeKey = prefs.getString("youtube_api_key", "")
