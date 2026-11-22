@@ -351,7 +351,18 @@ private fun sendToAi() {
                     }
                 )
             } else {
-                GeminiClient(this).chat(key, question)
+                if (
+    question.contains("news", true) ||
+    question.contains("நியூஸ்") ||
+    question.contains("செய்தி") ||
+    question.contains("latest", true) ||
+    question.contains("today", true) ||
+    question.contains("இன்று")
+) {
+    GeminiClient(this).chatWithSearch(key, question)
+} else {
+    GeminiClient(this).chat(key, question)
+                }
             }
 
             runOnUiThread {
