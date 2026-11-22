@@ -33,21 +33,36 @@ class GeminiClient(private val context: Context) {
         return generate(apiKey, prompt, null, null)
     }
 
-    fun chatWithSearch(apiKey: String, question: String): String {
-        val prompt = """
+    
+fun chatWithSearch(apiKey: String, question: String): String {
+    val tavilyKey = context
+        .getSharedPreferences("lotus", Context.MODE_PRIVATE)
+        .getString("tavily_api_key", "")
+        .orEmpty()
+
+    if (tavilyKey.isBlank()) {
+        throw IOException("Settings-ல் Tavily API key save செய்யுங்கள்.")
+    }
+
+    val searchResults = searchTavily(tavilyKey, question)
+
+    val prompt = """
         You are Lotus, a friendly South Indian female AI assistant.
         Reply naturally in Tamil or Tanglish.
-        Use Google Search for current information, latest news,
-        weather, prices, events and recent facts.
-        Give accurate answers based on search results.
-        Never invent current information.
+        Answer using the latest web search results below.
+        Never invent facts that are not supported by the results.
+        Include useful source URLs in your answer.
+
         User question:
         $question
+
+        Web search results:
+        $searchResults
     """.trimIndent()
 
-    return generate(apiKey, prompt, null, null, enableSearch = true)
+    return generate(apiKey, prompt, null, null)
 }
-
+    
     fun askAboutVideo(apiKey: String, videoUri: Uri, question: String): String {
         val uploaded = uploadVideo(apiKey, videoUri)
         val fileUri = uploaded.first
