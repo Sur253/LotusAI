@@ -188,8 +188,8 @@ center.addView(
     }
     bottomRow.addView(
         mic,
-        LinearLayout.LayoutParams(58, 58).apply {
-            rightMargin = 8
+        LinearLayout.LayoutParams(68, 68).apply {
+    rightMargin = 8
         }
     )
 
