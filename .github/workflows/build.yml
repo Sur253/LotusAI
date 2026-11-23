@@ -25,6 +25,9 @@ jobs:
       - name: Copy GeminiClient
         run: |
           cp GeminiClient.kt lotus-project/PersonalVideoAI/app/src/main/java/com/personalvideoai/GeminiClient.kt  
+      - name: Copy VoiceService
+        run: |
+          cp VoiceService.kt lotus-project/PersonalVideoAI/app/src/main/java/com/personalvideoai/VoiceService.kt
       - name: Add Lotus Background Image
         working-directory: lotus-project/PersonalVideoAI
         run: |
