@@ -55,7 +55,46 @@ class MainActivity : Activity() {
             ttsReady = false
         }
     }
+      checkVoicePermission() 
     }  
+   private fun checkVoicePermission() {
+    val permissions = mutableListOf(
+        android.Manifest.permission.RECORD_AUDIO
+    )
+
+    if (android.os.Build.VERSION.SDK_INT >= 33) {
+        permissions.add(android.Manifest.permission.POST_NOTIFICATIONS)
+    }
+
+    val missing = permissions.filter {
+        checkSelfPermission(it) != android.content.pm.PackageManager.PERMISSION_GRANTED
+    }
+
+    if (missing.isNotEmpty()) {
+        requestPermissions(missing.toTypedArray(), 101)
+    } else {
+        startVoiceService()
+    }
+}
+private fun startVoiceService() {
+    val intent = android.content.Intent(this, VoiceService::class.java)
+    startForegroundService(intent)
+}
+
+override fun onRequestPermissionsResult(
+    requestCode: Int,
+    permissions: Array<out String>,
+    grantResults: IntArray
+) {
+    super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+
+    if (requestCode == 101 &&
+        grantResults.isNotEmpty() &&
+        grantResults[0] == android.content.pm.PackageManager.PERMISSION_GRANTED
+    ) {
+        startVoiceService()
+    }
+} 
     private fun rounded(fill: Int, stroke: Int = Color.TRANSPARENT, radius: Float = 24f): GradientDrawable =
         GradientDrawable().apply {
             setColor(fill)
