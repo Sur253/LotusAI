@@ -213,32 +213,43 @@ center.addView(
             }
         }
     }
-
     bottomRow.addView(
-        input,
-        LinearLayout.LayoutParams(0, 56, 1f)
-    )
-
-    val send = pill("➤") {
-        sendToAi()
+    input,
+    LinearLayout.LayoutParams(
+        0,
+        (60 * resources.displayMetrics.density).toInt(),
+        1f
+    ).apply {
+        leftMargin = (8 * resources.displayMetrics.density).toInt()
+        rightMargin = (8 * resources.displayMetrics.density).toInt()
     }
-    bottomRow.addView(
-        send,
-        LinearLayout.LayoutParams(58, 58).apply {
-            leftMargin = 8
-        }
-    )
+)
 
-    root.addView(
-        bottomRow,
-        LinearLayout.LayoutParams(
-            LinearLayout.LayoutParams.MATCH_PARENT,
-            64
-        )
-    )
-
-    setContentView(root)
+val send = pill("➤") {
+    sendToAi()
 }
+
+bottomRow.addView(
+    send,
+    LinearLayout.LayoutParams(
+        (58 * resources.displayMetrics.density).toInt(),
+        (58 * resources.displayMetrics.density).toInt()
+    ).apply {
+        leftMargin = (6 * resources.displayMetrics.density).toInt()
+    }
+)
+
+root.addView(
+    bottomRow,
+    LinearLayout.LayoutParams(
+        LinearLayout.LayoutParams.MATCH_PARENT,
+        (72 * resources.displayMetrics.density).toInt()
+    )
+)
+
+setContentView(root)
+     }
+     
      
 private fun showSettings() {
     val box = LinearLayout(this).apply {
