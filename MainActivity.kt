@@ -199,7 +199,9 @@ center.addView(
         setTextColor(text)
         setHintTextColor(muted)
         maxLines = 1
-        setPadding(16, 8, 16, 8)
+        setPadding(16, 0, 16, 0)
+        gravity = android.view.Gravity.CENTER_VERTICAL
+        includeFontPadding = true
         background = rounded(panel, Color.rgb(75, 65, 100), 30f)
         imeOptions = android.view.inputmethod.EditorInfo.IME_ACTION_SEND
         setOnEditorActionListener { _, actionId, _ ->
@@ -214,7 +216,7 @@ center.addView(
 
     bottomRow.addView(
         input,
-        LinearLayout.LayoutParams(0, 60, 1f)
+        LinearLayout.LayoutParams(0, 56, 1f)
     )
 
     val send = pill("➤") {
