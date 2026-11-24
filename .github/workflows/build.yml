@@ -218,6 +218,12 @@ jobs:
         with:
           gradle-version: '8.9'
 
+      - name: Verify Sherpa Dependency
+        working-directory: lotus-project/PersonalVideoAI
+        run: |
+          echo "Checking Sherpa AAR"
+          ls -lh app/libs/
+          gradle :app:dependencies --configuration debugCompileClasspath | grep -i -C 3 sherpa || true
       - name: Build APK
         working-directory: lotus-project/PersonalVideoAI
         run: gradle assembleDebug
