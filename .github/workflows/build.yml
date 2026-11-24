@@ -28,6 +28,12 @@ jobs:
       - name: Copy VoiceService
         run: |
           cp VoiceService.kt lotus-project/PersonalVideoAI/app/src/main/java/com/personalvideoai/VoiceService.kt
+      
+      - name: Download Sherpa ONNX AAR
+        run: |
+          mkdir -p lotus-project/PersonalVideoAI/app/libs
+          curl -L https://github.com/k2-fsa/sherpa-onnx/releases/download/v2.0.3/sherpa-onnx-2.0.3.aar -o lotus-project/PersonalVideoAI/app/libs/sherpa-onnx-2.0.3.aar
+          ls -lh lotus-project/PersonalVideoAI/app/libs/
       - name: Add Lotus Background Image
         working-directory: lotus-project/PersonalVideoAI
         run: |
