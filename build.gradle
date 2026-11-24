@@ -2,7 +2,9 @@ plugins {
     id 'com.android.application'
     id 'org.jetbrains.kotlin.android'
 }
-
+repositories {
+    maven { url 'https://jitpack.io' }
+}
 android {
     namespace 'com.personalvideoai'
     compileSdk 35
