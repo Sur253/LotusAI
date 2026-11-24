@@ -73,9 +73,11 @@ class MainActivity : Activity() {
     }
 
     if (missing.isNotEmpty()) {
-        requestPermissions(missing.toTypedArray(), 101)
-    } else {
-        startVoiceService()
+    Toast.makeText(this, "Requesting: $missing", Toast.LENGTH_LONG).show()
+    requestPermissions(missing.toTypedArray(), 101)
+} else {
+    Toast.makeText(this, "Permissions already granted", Toast.LENGTH_LONG).show()
+    startVoiceService()
     }
 }
 private fun startVoiceService() {
