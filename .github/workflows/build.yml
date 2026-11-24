@@ -40,6 +40,17 @@ jobs:
           curl -fL https://github.com/k2-fsa/sherpa-onnx/releases/download/kws-models/sherpa-onnx-kws-zipformer-gigaspeech-3.3M-2024-01-01.tar.bz2 -o /tmp/lotus-kws.tar.bz2
           tar -xjf /tmp/lotus-kws.tar.bz2 -C lotus-project/PersonalVideoAI/app/src/main/assets
           ls -lh "$MODEL_DIR"
+      - name: Create Hey Lotus Keyword
+        run: |
+          pip install sherpa-onnx
+          MODEL_DIR="lotus-project/PersonalVideoAI/app/src/main/assets/sherpa-onnx-kws-zipformer-gigaspeech-3.3M-2024-01-01"
+          echo "HEY LOTUS" > keywords_raw.txt
+          sherpa-onnx-cli text2token \
+            --tokens "$MODEL_DIR/tokens.txt" \
+            --tokens-type bpe \
+            --bpe-model "$MODEL_DIR/bpe.model" \
+            keywords_raw.txt "$MODEL_DIR/keywords.txt"
+          cat "$MODEL_DIR/keywords.txt"
       - name: Add Lotus Background Image
         working-directory: lotus-project/PersonalVideoAI
         run: |
