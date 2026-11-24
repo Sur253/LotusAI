@@ -58,7 +58,6 @@ class MainActivity : Activity() {
       checkVoicePermission() 
     }  
    private fun checkVoicePermission() {
-       Toast.makeText(this, "Lotus Permission Check Started", Toast.LENGTH_LONG).show()
        
        val permissions = mutableListOf(
         android.Manifest.permission.RECORD_AUDIO
@@ -92,13 +91,17 @@ override fun onRequestPermissionsResult(
 ) {
     super.onRequestPermissionsResult(requestCode, permissions, grantResults)
 
-    if (requestCode == 101 &&
-        grantResults.isNotEmpty() &&
-        grantResults[0] == android.content.pm.PackageManager.PERMISSION_GRANTED
-    ) {
+    if (requestCode == 101) {
+    val audioGranted =
+        checkSelfPermission(android.Manifest.permission.RECORD_AUDIO) ==
+        android.content.pm.PackageManager.PERMISSION_GRANTED
+
+    if (audioGranted) {
         startVoiceService()
+    } else {
+        Toast.makeText(this, "Microphone permission not granted", Toast.LENGTH_LONG).show()
     }
-} 
+    }
     private fun rounded(fill: Int, stroke: Int = Color.TRANSPARENT, radius: Float = 24f): GradientDrawable =
         GradientDrawable().apply {
             setColor(fill)
