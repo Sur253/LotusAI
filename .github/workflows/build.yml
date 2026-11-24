@@ -42,7 +42,7 @@ jobs:
           ls -lh "$MODEL_DIR"
       - name: Create Hey Lotus Keyword
         run: |
-          pip install sherpa-onnx
+          pip install sherpa-onnx sentencepiece
           MODEL_DIR="lotus-project/PersonalVideoAI/app/src/main/assets/sherpa-onnx-kws-zipformer-gigaspeech-3.3M-2024-01-01"
           echo "HEY LOTUS" > keywords_raw.txt
           sherpa-onnx-cli text2token \
