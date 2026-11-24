@@ -58,7 +58,9 @@ class MainActivity : Activity() {
       checkVoicePermission() 
     }  
    private fun checkVoicePermission() {
-    val permissions = mutableListOf(
+       Toast.makeText(this, "Lotus Permission Check Started", Toast.LENGTH_LONG).show()
+       
+       val permissions = mutableListOf(
         android.Manifest.permission.RECORD_AUDIO
     )
 
