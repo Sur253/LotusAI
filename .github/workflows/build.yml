@@ -33,6 +33,12 @@ jobs:
           mkdir -p lotus-project/PersonalVideoAI/app/libs
           curl -fL https://github.com/k2-fsa/sherpa-onnx/releases/download/v2.0.3/sherpa-onnx-2.0.3.aar -o lotus-project/PersonalVideoAI/app/libs/sherpa-onnx-2.0.3.aar
           ls -lh lotus-project/PersonalVideoAI/app/libs/ 
+      - name: Check Sherpa AAR Classes
+        run: |
+          AAR="lotus-project/PersonalVideoAI/app/libs/sherpa-onnx-2.0.3.aar"
+          unzip -l "$AAR" | grep -E "classes.jar|AndroidManifest.xml"
+          unzip -p "$AAR" classes.jar > /tmp/sherpa-classes.jar
+          jar tf /tmp/sherpa-classes.jar | grep "KeywordSpotter"  
       - name: Download English Wake Word Model
         run: |
           MODEL_DIR="lotus-project/PersonalVideoAI/app/src/main/assets/sherpa-onnx-kws-zipformer-gigaspeech-3.3M-2024-01-01"
