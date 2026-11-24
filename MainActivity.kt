@@ -83,7 +83,6 @@ private fun startVoiceService() {
     val intent = android.content.Intent(this, VoiceService::class.java)
     startForegroundService(intent)
 }
-
 override fun onRequestPermissionsResult(
     requestCode: Int,
     permissions: Array<out String>,
@@ -92,23 +91,33 @@ override fun onRequestPermissionsResult(
     super.onRequestPermissionsResult(requestCode, permissions, grantResults)
 
     if (requestCode == 101) {
-    val audioGranted =
-        checkSelfPermission(android.Manifest.permission.RECORD_AUDIO) ==
-        android.content.pm.PackageManager.PERMISSION_GRANTED
+        val audioGranted =
+            checkSelfPermission(android.Manifest.permission.RECORD_AUDIO) ==
+            android.content.pm.PackageManager.PERMISSION_GRANTED
 
-    if (audioGranted) {
-        startVoiceService()
-    } else {
-        Toast.makeText(this, "Microphone permission not granted", Toast.LENGTH_LONG).show()
-    }
-    }
-    private fun rounded(fill: Int, stroke: Int = Color.TRANSPARENT, radius: Float = 24f): GradientDrawable =
-        GradientDrawable().apply {
-            setColor(fill)
-            cornerRadius = radius
-            if (stroke != Color.TRANSPARENT) setStroke(1, stroke)
+        if (audioGranted) {
+            startVoiceService()
+        } else {
+            Toast.makeText(
+                this,
+                "Microphone permission not granted",
+                Toast.LENGTH_LONG
+            ).show()
         }
+    }
+}
 
+private fun rounded(
+    fill: Int,
+    stroke: Int = Color.TRANSPARENT,
+    radius: Float = 24f
+): GradientDrawable =
+    GradientDrawable().apply {
+        setColor(fill)
+        cornerRadius = radius
+        if (stroke != Color.TRANSPARENT) setStroke(1, stroke)
+    }
+    
     private fun pill(textValue: String, onClick: () -> Unit): TextView = TextView(this).apply {
         text = textValue
         textSize = 15f
