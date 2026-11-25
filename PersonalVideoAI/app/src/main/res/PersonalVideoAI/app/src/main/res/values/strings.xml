@@ -1,1 +1,7 @@
 
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">LOTUS AI</string>
+    <string name="lotus_accessibility_description">Lotus AI can read screen content and assist with app controls when enabled.</string>
+</resources>
+
