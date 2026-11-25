@@ -227,7 +227,15 @@ jobs:
           gradle :app:dependencies --configuration debugCompileClasspath | grep -i -C 3 sherpa || true
       - name: Build APK
         working-directory: lotus-project/PersonalVideoAI
-        run: gradle assembleDebug
+        run: |
+          echo "Checking Sherpa dependency"
+          grep -n "sherpa" app/build.gradle || true
+          echo "Checking AAR file"
+          ls -lh app/libs/
+          echo "Checking compile classpath"
+          gradle :app:dependencies --configuration debugCompileClasspath | grep -i -C 3 sherpa || true
+          echo "Starting APK build"
+          gradle assembleDebug
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
