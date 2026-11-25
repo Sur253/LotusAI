@@ -230,6 +230,10 @@ jobs:
           echo "Checking Sherpa AAR"
           ls -lh app/libs/
           gradle :app:dependencies --configuration debugCompileClasspath | grep -i -C 3 sherpa || true
+      - name: Increase Gradle Memory
+        run: |
+          mkdir -p ~/.gradle
+          echo "org.gradle.jvmargs=-Xmx4g -XX:MaxMetaspaceSize=1g -Dfile.encoding=UTF-8" >> ~/.gradle/gradle.properties
       - name: Build APK
         working-directory: lotus-project/PersonalVideoAI
         run: |
