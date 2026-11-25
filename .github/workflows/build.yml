@@ -33,6 +33,11 @@ jobs:
           mkdir -p lotus-project/PersonalVideoAI/app/libs
           curl -fL https://github.com/k2-fsa/sherpa-onnx/releases/download/v2.0.3/sherpa-onnx-2.0.3.aar -o lotus-project/PersonalVideoAI/app/libs/sherpa-onnx-2.0.3.aar
           ls -lh lotus-project/PersonalVideoAI/app/libs/ 
+      - name: Add Sherpa AAR Dependency
+        working-directory: lotus-project/PersonalVideoAI
+        run: |
+          grep -q "sherpa-onnx-2.0.3.aar" app/build.gradle || sed -i "/^dependencies[[:space:]]*{/a\    implementation files('libs/sherpa-onnx-2.0.3.aar')" app/build.gradle
+          grep -n sherpa app/build.gradle 
       - name: Verify Sherpa Dependency
         working-directory: lotus-project/PersonalVideoAI
         run: |
