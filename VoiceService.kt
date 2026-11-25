@@ -13,6 +13,7 @@ import android.media.AudioRecord
 import android.media.MediaRecorder
 import android.os.Build
 import android.os.IBinder
+import android.os.PowerManager
 import android.util.Log
 
 import com.k2fsa.sherpa.onnx.FeatureConfig
@@ -213,8 +214,20 @@ class VoiceService : Service() {
             spotter = null
         }
     }
+  private fun wakeUpScreen() {
+      val powerManager =
+        getSystemService(POWER_SERVICE) as PowerManager
 
+    val wakeLock = powerManager.newWakeLock(
+        PowerManager.SCREEN_BRIGHT_WAKE_LOCK or
+                PowerManager.ACQUIRE_CAUSES_WAKEUP,
+        "LotusAI:WakeLock"
+    )
+
+    wakeLock.acquire(5000)
+}
     private fun showDetectedNotification() {
+            wakeUpScreen() 
         val manager =
             getSystemService(NOTIFICATION_SERVICE) as NotificationManager
 
