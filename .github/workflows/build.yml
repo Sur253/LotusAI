@@ -240,7 +240,7 @@ jobs:
           echo "Checking compile classpath"
           gradle :app:dependencies --configuration debugCompileClasspath | grep -i -C 3 sherpa || true
           echo "Starting APK build"
-          gradle assembleDebug
+          gradle assembleDebug --stacktrace
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
