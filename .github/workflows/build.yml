@@ -37,7 +37,7 @@ jobs:
         working-directory: lotus-project/PersonalVideoAI
         run: |
           echo "Checking app/build.gradle"
-          grep -n "sherpa" app/build.gradle || true
+          cat app/build.gradle
           echo "Checking Gradle dependencies"
           gradle :app:dependencies --configuration debugCompileClasspath
       - name: Download English Wake Word Model
