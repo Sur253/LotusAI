@@ -28,6 +28,9 @@ jobs:
       - name: Copy VoiceService
         run: |
           cp VoiceService.kt lotus-project/PersonalVideoAI/app/src/main/java/com/personalvideoai/VoiceService.kt
+      - name: Copy LotusAccessibilityService
+        run: |
+          cp LotusAccessibilityService.kt lotus-project/PersonalVideoAI/app/src/main/java/com/personalvideoai/LotusAccessibilityService.kt
       - name: Download Sherpa ONNX AAR
         run: |
           mkdir -p lotus-project/PersonalVideoAI/app/libs
