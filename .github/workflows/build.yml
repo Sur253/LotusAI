@@ -34,6 +34,12 @@ jobs:
       - name: Copy Android Manifest
         run: |
           cp AndroidManifest.xml lotus-project/PersonalVideoAI/app/src/main/AndroidManifest.xml
+      - name: Copy Accessibility Resources
+        run: |
+          mkdir -p lotus-project/PersonalVideoAI/app/src/main/res/xml
+          mkdir -p lotus-project/PersonalVideoAI/app/src/main/res/values
+          cp PersonalVideoAI/app/src/main/res/xml/lotus_accessibility_config.xml lotus-project/PersonalVideoAI/app/src/main/res/xml/lotus_accessibility_config.xml
+          cp PersonalVideoAI/app/src/main/res/values/strings.xml lotus-project/PersonalVideoAI/app/src/main/res/values/strings.xml
       - name: Download Sherpa ONNX AAR
         run: |
           mkdir -p lotus-project/PersonalVideoAI/app/libs
