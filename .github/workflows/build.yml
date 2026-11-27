@@ -31,6 +31,9 @@ jobs:
       - name: Copy LotusAccessibilityService
         run: |
           cp LotusAccessibilityService.kt lotus-project/PersonalVideoAI/app/src/main/java/com/personalvideoai/LotusAccessibilityService.kt
+      - name: Copy Android Manifest
+        run: |
+          cp PersonalVideoAI/app/src/main/AndroidManifest.xml lotus-project/PersonalVideoAI/app/src/main/AndroidManifest.xml  
       - name: Download Sherpa ONNX AAR
         run: |
           mkdir -p lotus-project/PersonalVideoAI/app/libs
