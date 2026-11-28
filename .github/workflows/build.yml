@@ -276,7 +276,13 @@ jobs:
           echo "===== APK CONTENTS ====="
           unzip -l "$APK" | grep -E 'lib/|classes.dex|assets/' | head -40
 
-          echo "===== APK CHECK COMPLETE ====="
+          echo "===== APK DETAILS ====="
+          AAPT=$(find "$ANDROID_HOME/build-tools" -name aapt | sort -V | tail -1)
+          "$AAPT" dump badging "$APK" | head -20
+
+          echo "===== 16KB ALIGNMENT CHECK ====="
+          ZIPALIGN=$(find "$ANDROID_HOME/build-tools" -name zipalign | sort -V | tail -1)
+          "$ZIPALIGN" -c -P 16 -v 4 "$APK"
           
       - name: Upload APK
         uses: actions/upload-artifact@v4
