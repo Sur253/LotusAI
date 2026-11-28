@@ -258,6 +258,26 @@ jobs:
           echo "Starting APK build"
           gradle assembleDebug --stacktrace
 
+      - name: Diagnose APK
+        working-directory: lotus-project/PersonalVideoAI
+        run: |
+          APK="app/build/outputs/apk/debug/app-debug.apk"
+
+          echo "===== APK SIZE ====="
+          ls -lh "$APK"
+
+          echo "===== APK FILE TYPE ====="
+          file "$APK"
+
+          echo "===== APK SIGNATURE ====="
+          APKSIGNER=$(find "$ANDROID_HOME/build-tools" -name apksigner | sort -V | tail -1)
+          "$APKSIGNER" verify --verbose --print-certs "$APK"
+
+          echo "===== APK CONTENTS ====="
+          unzip -l "$APK" | grep -E 'lib/|classes.dex|assets/' | head -40
+
+          echo "===== APK CHECK COMPLETE ====="
+          
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
