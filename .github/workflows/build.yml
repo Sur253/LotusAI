@@ -246,6 +246,10 @@ jobs:
         run: |
           mkdir -p ~/.gradle
           echo "org.gradle.jvmargs=-Xmx4g -XX:MaxMetaspaceSize=1g -Dfile.encoding=UTF-8" >> ~/.gradle/gradle.properties
+      - name: Clean Previous Build
+        working-directory: lotus-project/PersonalVideoAI
+        run: |
+         gradle clean
       - name: Build APK
         working-directory: lotus-project/PersonalVideoAI
         run: |
